@@ -1,0 +1,96 @@
+name: Update Runner Images
+on:
+  push:
+    branches: [ "*" ]
+    tags: [ "*" ]
+  pull_request:
+
+env:
+  REGISTRY_USER: redhat-github-actions+redhat_actions_ci_pusher
+  REGISTRY_URL: quay.io/redhat-github-actions
+
+  BASE_IMG_NAME: runner
+  BASE_IMG_DIR: base
+
+  BUILDAH_IMG_NAME: buildah-runner
+  BUILDAH_IMG_DIR: buildah
+
+jobs:
+  update_images:
+    name: Update images
+    runs-on: ubuntu-20.04
+
+    steps:
+      - uses: actions/checkout@v2
+
+      - uses: tetchel/commit-data@v1
+        id: commit_data
+
+      - name: Determine tag
+        run: |
+          export IMG_TAG=latest
+          export GIT_TAG="${{ steps.commit_data.outputs.tag }}"
+          export BRANCH="${{ steps.commit_data.outputs.branch }}"
+
+          if [[ -n "$GIT_TAG" ]]; then
+            IMG_TAG="$GIT_TAG"
+          elif [[ -n "$BRANCH" ]]; then
+            if [[ "$BRANCH" == "main" ]]; then
+              IMG_TAG="latest"
+            else
+              IMG_TAG=$BRANCH
+            fi
+          else
+            IMG_TAG="${{ steps.commit_data.outputs.short_sha }}"
+          fi
+
+          echo "IMG_TAG=$IMG_TAG" >> $GITHUB_ENV
+          echo "BRANCH=$BRANCH" >> $GITHUB_ENV
+          echo "Tagging images with '$IMG_TAG'"
+
+      - name: Build base image
+        id: build_base_img
+        uses: redhat-actions/buildah-build@v1
+        with:
+          image: ${{ env.BASE_IMG_NAME }}
+          tag: ${{ env.IMG_TAG }}
+          oci: true
+          context:
+            ${{ env.BASE_IMG_DIR }}
+          dockerfiles:
+            ${{ env.BASE_IMG_DIR }}/Dockerfile
+
+      - name: Push base image
+        uses: redhat-actions/push-to-registry@v1
+        if: steps.commit_data.outputs.is_pr == 'false'
+        with:
+          image: ${{ env.BASE_IMG_NAME }}
+          tag: ${{ env.IMG_TAG }}
+          registry: ${{ env.REGISTRY_URL }}
+          username: ${{ env.REGISTRY_USER }}
+          password: ${{ secrets.QUAY_TOKEN }}
+
+      # The buildah image is done on the same machine so that it doesn't have to pull the updated base image; it's already there locally.
+
+      - name: Build buildah image
+        uses: redhat-actions/buildah-build@v1
+        with:
+          image: ${{ env.BUILDAH_IMG_NAME }}
+          tag: ${{ env.IMG_TAG }}
+          oci: true
+          context:
+            ${{ env.BUILDAH_IMG_DIR }}
+          dockerfiles:
+            ${{ env.BUILDAH_IMG_DIR }}/Dockerfile
+          build-args:
+            BASE_IMG=${{ steps.build_base_img.outputs.image }}
+
+      - name: Push buildah image
+        uses: redhat-actions/push-to-registry@v1
+        if: steps.commit_data.outputs.is_pr == 'false'
+        with:
+          image: ${{ env.BUILDAH_IMG_NAME }}
+          tag: ${{ env.IMG_TAG }}
+          registry: ${{ env.REGISTRY_URL }}
+          username: ${{ env.REGISTRY_USER }}
+          password: ${{ secrets.QUAY_TOKEN }}
