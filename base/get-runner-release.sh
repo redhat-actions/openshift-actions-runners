@@ -20,6 +20,7 @@ curl -sSLf -H "$auth_header" -H 'Accept: application/json' -o $release_file $rel
 
 latest_tag=$(jq -r '.tag_name' $release_file)
 echo "Latest runner is ${latest_tag}"
+echo $latest_tag >> "RUNNER_VERSION.txt"
 rm $release_file
 
 tag_without_v=$(echo $latest_tag | cut -c 2-)
