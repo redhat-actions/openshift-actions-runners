@@ -32,7 +32,7 @@ if [ -z "${RUNNER_TOKEN:-}" ]; then
         token_url="https://api.github.com/repos/${GITHUB_OWNER}/${GITHUB_REPOSITORY}/actions/runners/registration-token"
         registration_url="${registration_url}/${GITHUB_REPOSITORY}"
     fi
-    echo "Requesting token at ${token_url}"
+    echo "Obtaining runner token from ${token_url}"
 
     payload=$(curl -sSfLX POST -H "Authorization: token ${GITHUB_PAT}" ${token_url})
     export RUNNER_TOKEN=$(echo $payload | jq .token --raw-output)
