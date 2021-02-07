@@ -22,6 +22,13 @@ The images are hosted at [quay.io/redhat-github-actions](https://quay.io/redhat-
 ## Installing into a cluster
 Use the [**OpenShift Actions Runner Chart**](https://github.com/redhat-actions/openshift-actions-runner-chart) to deploy these runners into your cluster.
 
+## Creating a Personal Access Token
+<a id="pat-guidelines"></a>
+To register themselves with GitHub, the runners require a [GitHub Personal Access Token](https://docs.github.com/en/free-pro-team@latest/github/authenticating-to-github/creating-a-personal-access-token) (PAT) which has the `repo` permission scope. This is provided to the container through the `GITHUB_PAT` environment variable.
+- The user who created the token must have administrator permission on the organization/repository the runner will be added to.
+- If the runner will be for an organization, the token must also have the `admin:org` permission scope.
+- [See an example](./pat-creation.png).
+
 ## Creating your own runner image
 
 You can create your own runner image based on this one, and install any runtimes and tools your workflows need.
@@ -30,6 +37,24 @@ You can create your own runner image based on this one, and install any runtimes
 2. Edit the Dockerfile to install and set up your tools, environment, etc. Do not override the `ENTRYPOINT`.
 3. Build and push your new runner image.
 4. Install [OpenShift Action Runner Chart](https://github.com/redhat-actions/openshift-actions-runner-chart) but set the value `runnerImage` to your image, and `runnerTag` to your tag.
+
+## Running Locally
+You can run the images locally to test and develop.
+
+To launch and connect a runner to `redhat-actions/openshift-actions-runner` with the labels `local` and `docker`:
+```sh
+docker run \
+    --env GITHUB_OWNER=redhat-actions \
+    --env GITHUB_REPOSITORY=openshift-actions-runner \
+    --env GITHUB_PAT=$GITHUB_PAT \
+    --env RUNNER_LABELS="local,docker" \
+    quay.io/redhat-github-actions/runner:v1.0.0
+```
+
+Or, to run a shell for debugging:
+```sh
+docker run -it --entrypoint=/bin/bash quay.io/redhat-github-actions/runner:v1.0.0
+```
 
 ## Credits
 This repository builds on the work done in [bbrowning/github-runner](https://github.com/bbrowning/github-runner), which is forked from [SanderKnape/github-runner](https://github.com/SanderKnape/github-runner).

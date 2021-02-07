@@ -7,6 +7,7 @@ set -eE -o pipefail
 echo "Invoking uid script.."
 ./uid.sh
 echo "uid script succeeded"
+echo "========================================"
 
 if [ -z "${GITHUB_OWNER:-}" ]; then
     echo "Fatal: \$GITHUB_OWNER must be set in the environment"
@@ -16,11 +17,15 @@ elif [ -z "${GITHUB_PAT:-}" ]; then
     exit 1
 fi
 
+if [ -z "${GITHUB_REPOSITORY:-}" ] && [ -n "${GITHUB_REPO:-}" ]; then
+    GITHUB_REPOSITORY=$GITHUB_REPO
+fi
+
 # https://docs.github.com/en/free-pro-team@latest/rest/reference/actions#create-a-registration-token-for-an-organization
 
 registration_url="https://github.com/${GITHUB_OWNER}"
 if [ -z "${RUNNER_TOKEN:-}" ]; then
-    if [ -z "${GITHUB_REPOSITORY}" ]; then
+    if [ -z "${GITHUB_REPOSITORY:-}" ]; then
         echo "Runner is scoped to organization '${GITHUB_OWNER}'"
         echo "View runner status at https://github.com/organizations/${GITHUB_OWNER}/settings/actions"
 

@@ -39,14 +39,14 @@ COPY --chown=${USER}:0 get-runner-release.sh ./
 RUN ./get-runner-release.sh
 RUN ./bin/installdependencies.sh
 
-COPY --chown=${USER}:0 entrypoint.sh uid.sh ./
-RUN chmod -v ug+x *.sh
-
 # Set permissions so that we can allow the openshift-generated container user to access home and /etc/passwd.
 # https://docs.openshift.com/container-platform/3.3/creating_images/guidelines.html#openshift-container-platform-specific-guidelines
 RUN chown -R ${USER}:0 /home/$USER/ && \
     chgrp -R 0 /home/$USER/ && \
     chmod -R g=u /home/$USER/
+
+COPY --chown=${USER}:0 entrypoint.sh uid.sh ./
+RUN chmod -v ug+x *.sh
 
 USER $UID
 
