@@ -14,12 +14,13 @@ RUN dnf -y --setopt=skip_missing_names_on_install=False install \
 
 ARG USER=runner
 ARG UID=1001
+ARG RUNNER_WORKDIR=/home/${USER}/_work
 
 # Override these when creating the container.
 ENV GITHUB_PAT ""
 ENV GITHUB_OWNER ""
 ENV GITHUB_REPOSITORY ""
-ENV RUNNER_WORKDIR "_work"
+ENV RUNNER_WORKDIR $RUNNER_WORKDIR
 ENV RUNNER_LABELS ""
 
 # Create our user and their home directory
@@ -48,7 +49,7 @@ RUN chown -R ${USER}:0 /home/$USER/ && \
 COPY --chown=${USER}:0 entrypoint.sh uid.sh ./
 RUN chmod -v ug+x *.sh
 
-USER $UID
+USER $UID:0
 
 ENV USER_NAME=$USER
 ENTRYPOINT ./entrypoint.sh

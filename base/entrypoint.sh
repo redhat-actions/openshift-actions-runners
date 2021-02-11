@@ -75,7 +75,7 @@ trap 'remove; exit 130' INT
 trap 'remove; exit 143' TERM
 
 set -x
-./bin/runsvc.sh "$*" &
+./bin/runsvc.sh --once &
 svc_pid=$!
 
 wait $svc_pid

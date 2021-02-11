@@ -26,6 +26,7 @@ else
 fi
 
 echo "whoami=$(whoami)"
+echo "groups=$(groups)"
 
 set +x
 if ! grep $username /etc/subuid &> /dev/null; then
