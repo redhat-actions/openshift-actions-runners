@@ -1,13 +1,6 @@
 FROM fedora:33
 
 # Adapted from https://github.com/bbrowning/github-runner/blob/master/Dockerfile
-RUN dnf -y update
-    # This package is required for jq https://stackoverflow.com/a/45745410/3666734
-    # rhel/ubi:
-    # dnf -y install https://dl.fedoraproject.org/pub/epel/epel-release-latest-8.noarch.rpm
-    # centos:
-    # dnf -y install epel-release
-
 RUN dnf -y --setopt=skip_missing_names_on_install=False install \
     curl git jq hostname procps && \
     dnf clean all
