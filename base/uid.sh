@@ -11,6 +11,8 @@ uid=$(id -u)
 gid=$(id -g)
 username=${USER_NAME:-default}
 
+echo "Current user has ID ${uid} and GID ${gid}"
+
 if ! whoami &> /dev/null; then
   if [ -w /etc/passwd ]; then
     echo "Creating passwd entry for $username"
@@ -22,7 +24,7 @@ if ! whoami &> /dev/null; then
     exit 1
   fi
 else
-  echo "Current user already has passwd entry"
+  echo "User already has passwd entry"
 fi
 
 echo "whoami=$(whoami)"
@@ -30,7 +32,7 @@ echo "groups=$(groups)"
 
 set +x
 if ! grep $username /etc/subuid &> /dev/null; then
-  echo "Creating sub{u,g}id entries for $username with uid $uid and gid $gid"
+  echo "Creating sub{u,g}id entries for $username"
   subuids_start=$(expr $uid + 1000)
   subgids_start=$(expr $gid + 1000)
 
