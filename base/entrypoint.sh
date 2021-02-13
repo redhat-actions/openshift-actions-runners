@@ -4,10 +4,7 @@
 
 set -eE -o pipefail
 
-echo "Invoking uid script.."
-./uid.sh
-echo "uid script succeeded"
-echo "========================================"
+./uid.sh > /tmp/uid.sh.log 2>&1
 
 if [ -z "${GITHUB_OWNER:-}" ]; then
     echo "Fatal: \$GITHUB_OWNER must be set in the environment"
