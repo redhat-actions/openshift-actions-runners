@@ -7,7 +7,7 @@
 
 This repository contains Dockerfiles for building container images that act as [self-hosted GitHub Action runners](https://docs.github.com/en/free-pro-team@latest/actions/hosting-your-own-runners/about-self-hosted-runners) that work on OpenShift.
 
-The [**OpenShift Action Runner Chart**](https://github.com/redhat-actions/openshift-actions-runner-chart) is used to deploy these images into a cluster.
+The [**OpenShift Actions Runner Chart**](https://github.com/redhat-actions/openshift-actions-runner-chart) is used to deploy these images into a cluster, and the [**OpenShift Actions Runner Installer**](https://github.com/redhat-actions/openshift-actions-runner-installer) is an Action to automate the chart install.
 
 See [`base/`](./base) for the base runner.
 
@@ -18,6 +18,8 @@ The idea is that the base runner can be extended to build larger, more complex i
 For example, the buildah runner extends the base runner to add container tools capabilities (namely, `buildah` and `podman`).
 
 The images are hosted at [quay.io/redhat-github-actions](https://quay.io/redhat-github-actions/).
+
+While these images are developed for and tested on OpenShift, they do not contain any OpenShift specific code and should be compatible with any Kubernetes platform.
 
 ## Installing into a cluster
 Use the [**OpenShift Actions Runner Chart**](https://github.com/redhat-actions/openshift-actions-runner-chart) to deploy these runners into your cluster.
