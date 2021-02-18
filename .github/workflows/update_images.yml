@@ -15,6 +15,9 @@ env:
   BUILDAH_IMG_NAME: buildah-runner
   BUILDAH_IMG_DIR: buildah
 
+  K8S_TOOLS_IMG_NAME: k8s-tools-runner
+  K8S_TOOLS_IMG_DIR: k8s-tools
+
 jobs:
   update_images:
     name: Update images
@@ -50,10 +53,10 @@ jobs:
 
       - name: Build base image
         id: build_base_img
-        uses: redhat-actions/buildah-build@v1
+        uses: redhat-actions/buildah-build@v2
         with:
           image: ${{ env.BASE_IMG_NAME }}
-          tag: ${{ env.IMG_TAG }}
+          tags: latest ${{ env.IMG_TAG }}
           oci: true
           context:
             ${{ env.BASE_IMG_DIR }}
@@ -61,11 +64,11 @@ jobs:
             ${{ env.BASE_IMG_DIR }}/Dockerfile
 
       - name: Push base image
-        uses: redhat-actions/push-to-registry@v1
+        uses: redhat-actions/push-to-registry@v2
         if: steps.commit_data.outputs.is_pr == 'false'
         with:
           image: ${{ env.BASE_IMG_NAME }}
-          tag: ${{ env.IMG_TAG }}
+          tags: latest ${{ env.IMG_TAG }}
           registry: ${{ env.REGISTRY_URL }}
           username: ${{ env.REGISTRY_USER }}
           password: ${{ secrets.QUAY_TOKEN }}
@@ -73,10 +76,10 @@ jobs:
       # The buildah image is done on the same machine so that it doesn't have to pull the updated base image; it's already there locally.
 
       - name: Build buildah image
-        uses: redhat-actions/buildah-build@v1
+        uses: redhat-actions/buildah-build@v2
         with:
           image: ${{ env.BUILDAH_IMG_NAME }}
-          tag: ${{ env.IMG_TAG }}
+          tags: latest ${{ env.IMG_TAG }}
           oci: true
           context:
             ${{ env.BUILDAH_IMG_DIR }}
@@ -86,11 +89,11 @@ jobs:
             BASE_IMG=${{ steps.build_base_img.outputs.image }}
 
       - name: Push buildah image
-        uses: redhat-actions/push-to-registry@v1
+        uses: redhat-actions/push-to-registry@v2
         if: steps.commit_data.outputs.is_pr == 'false'
         with:
           image: ${{ env.BUILDAH_IMG_NAME }}
-          tag: ${{ env.IMG_TAG }}
+          tags: latest ${{ env.IMG_TAG }}
           registry: ${{ env.REGISTRY_URL }}
           username: ${{ env.REGISTRY_USER }}
           password: ${{ secrets.QUAY_TOKEN }}
