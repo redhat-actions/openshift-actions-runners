@@ -1,13 +1,16 @@
 #!/usr/bin/env bash
 
-installer_tmp=/tmp/tool-installer/
-install_target=/usr/local/bin/
+INSTALLER_TMP=/tmp/tool-installer/
+INSTALL_TARGET=/usr/local/bin/
 
-# create and use .bin/ for testing the script
-# install_target=.bin/
+if [[ -n $DEV_INSTALL_TARGET ]]; then
+    # Use this for testing the script without installing into your system dirs
+    echo "Using override install target $DEV_INSTALL_TARGET"
+    INSTALL_TARGET=$DEV_INSTALL_TARGET
+fi
 
 die() {
-    echo >&2 $1
+    echo >&2 "Error: $1"
     exit 1
 }
 
@@ -25,7 +28,7 @@ extract() {
 
     local archive_name=$1
     local executable_name=$2
-    local extract_dir=${installer_tmp}${executable_name}
+    local extract_dir=${INSTALLER_TMP}${executable_name}
 
     mkdir -vp $extract_dir
 
@@ -42,7 +45,20 @@ extract() {
     fi
 
     # Return using global var
-    extract_result=$(find $extract_dir -type f -iname $executable_name)
+    extract_result=$(find $extract_dir -type f -iname "$executable_name*")
+
+    if [[ -z $extract_result ]]; then
+        die "Could not find $executable_name in $extract_dir after extraction"
+    fi
+}
+
+move_executable() {
+    local executable_path=$1
+    local executable_name=$2
+    chmod a+x $executable_path
+    mv -v $executable_path $INSTALL_TARGET/$executable_name
+
+    echo "Installed $executable_name to $INSTALL_TARGET"
 }
 
 install() {
@@ -66,13 +82,22 @@ install() {
 
         # Global extract_result is the set in extract
         local executable_path=$extract_result
+
+        if [[ $executable_name == "oc" ]]; then
+            # special case for oc targz which also contains kubectl
+            local oc_path=$extract_result
+
+            extract $download_filename "kubectl"
+            local kubectl_path=$extract_result
+            move_executable $kubectl_path "kubectl"
+
+            # Reset
+            extract_result=$oc_path
+        fi
     fi
 
-    chmod a+x $executable_path
-    mv -v $executable_path $install_target
-    rm -rfv $download_filename
-
-    echo "Installed $executable_name to $install_target"
+    move_executable $executable_path $executable_name
+    rm -fv $download_filename
     echo
     echo "========================================"
 }
@@ -80,22 +105,21 @@ install() {
 # set -x
 set -eEu -o pipefail
 
-mkdir -vp $installer_tmp
+MIRROR="https://mirror.openshift.com/pub/openshift-v4/x86_64/clients"
+
+mkdir -vp $INSTALLER_TMP
 
 assert_env_var "HELM_VERSION"
-install helm https://get.helm.sh/helm-v${HELM_VERSION}-linux-amd64.tar.gz
+install helm ${MIRROR}/helm/${HELM_VERSION}/helm-linux-amd64.tar.gz
 
 assert_env_var "KN_VERSION"
-install kn https://github.com/knative/client/releases/download/v${KN_VERSION}/kn-linux-amd64
-
-assert_env_var "KUBECTL_VERSION"
-install kubectl https://dl.k8s.io/release/v${KUBECTL_VERSION}/bin/linux/amd64/kubectl
+install kn ${MIRROR}/serverless/${KN_VERSION}/kn-linux-amd64-${KN_VERSION}.tar.gz
 
 assert_env_var "OC_VERSION"
-install oc https://mirror.openshift.com/pub/openshift-v4/clients/ocp/${OC_VERSION}/openshift-client-linux.tar.gz
+install oc ${MIRROR}/ocp/${OC_VERSION}/openshift-client-linux.tar.gz
 
 assert_env_var "TKN_VERSION"
-install tkn https://github.com/tektoncd/cli/releases/download/v${TKN_VERSION}/tkn_${TKN_VERSION}_Linux_x86_64.tar.gz
+install tkn ${MIRROR}/pipeline/${TKN_VERSION}/tkn-linux-amd64-${TKN_VERSION}.tar.gz
 
-echo "Removing $installer_tmp"
-rm -rf $installer_tmp
+echo "Removing $INSTALLER_TMP"
+rm -rf $INSTALLER_TMP
