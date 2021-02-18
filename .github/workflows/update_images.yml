@@ -31,32 +31,32 @@ jobs:
 
       - name: Determine tag
         run: |
-          export IMG_TAG=latest
+          export IMG_TAGS=latest
           export GIT_TAG="${{ steps.commit_data.outputs.tag }}"
           export BRANCH="${{ steps.commit_data.outputs.branch }}"
 
           if [[ -n "$GIT_TAG" ]]; then
-            IMG_TAG="$GIT_TAG"
+            IMG_TAGS="$GIT_TAG"
           elif [[ -n "$BRANCH" ]]; then
             if [[ "$BRANCH" == "main" ]]; then
-              IMG_TAG="latest"
+              IMG_TAGS="latest"
             else
-              IMG_TAG=$BRANCH
+              IMG_TAGS=$BRANCH
             fi
           else
-            IMG_TAG="${{ steps.commit_data.outputs.short_sha }}"
+            IMG_TAGS="${{ steps.commit_data.outputs.short_sha }}"
           fi
 
-          echo "IMG_TAG=$IMG_TAG" >> $GITHUB_ENV
+          echo "IMG_TAGS=$IMG_TAGS" >> $GITHUB_ENV
           echo "BRANCH=$BRANCH" >> $GITHUB_ENV
-          echo "Tagging images with '$IMG_TAG'"
+          echo "Tagging images with '$IMG_TAGS'"
 
       - name: Build base image
         id: build_base_img
         uses: redhat-actions/buildah-build@v2
         with:
           image: ${{ env.BASE_IMG_NAME }}
-          tags: latest ${{ env.IMG_TAG }}
+          tags: ${{ env.IMG_TAGS }}
           oci: true
           context:
             ${{ env.BASE_IMG_DIR }}
@@ -68,32 +68,61 @@ jobs:
         if: steps.commit_data.outputs.is_pr == 'false'
         with:
           image: ${{ env.BASE_IMG_NAME }}
-          tags: latest ${{ env.IMG_TAG }}
+          tags: ${{ env.IMG_TAGS }}
           registry: ${{ env.REGISTRY_URL }}
           username: ${{ env.REGISTRY_USER }}
           password: ${{ secrets.QUAY_TOKEN }}
 
       # The buildah image is done on the same machine so that it doesn't have to pull the updated base image; it's already there locally.
+      - name: Determine image to build sub-images FROM
+        run: |
+          export FIRST_TAG=$(echo "${{ steps.build_base_img.outputs.tags }}" | awk '{ print $1 }')
+          export BASE_IMG=${{ steps.build_base_img.outputs.image }}:$FIRST_TAG
+          echo "Child images will be build from '$BASE_IMG'"
+          echo BASE_IMG=$BASE_IMG >> $GITHUB_ENV
 
       - name: Build buildah image
         uses: redhat-actions/buildah-build@v2
         with:
           image: ${{ env.BUILDAH_IMG_NAME }}
-          tags: latest ${{ env.IMG_TAG }}
+          tags: ${{ env.IMG_TAGS }}
           oci: true
           context:
             ${{ env.BUILDAH_IMG_DIR }}
           dockerfiles:
             ${{ env.BUILDAH_IMG_DIR }}/Dockerfile
-          build-args:
-            BASE_IMG=${{ steps.build_base_img.outputs.image }}
+          build-args: |
+            BASE_IMG=${{ env.BASE_IMG }}
 
       - name: Push buildah image
         uses: redhat-actions/push-to-registry@v2
         if: steps.commit_data.outputs.is_pr == 'false'
         with:
           image: ${{ env.BUILDAH_IMG_NAME }}
-          tags: latest ${{ env.IMG_TAG }}
+          tags: ${{ env.IMG_TAGS }}
+          registry: ${{ env.REGISTRY_URL }}
+          username: ${{ env.REGISTRY_USER }}
+          password: ${{ secrets.QUAY_TOKEN }}
+
+      - name: Build K8s tools image
+        uses: redhat-actions/buildah-build@v2
+        with:
+          image: ${{ env.K8S_TOOLS_IMG_NAME }}
+          tags: ${{ env.IMG_TAGS }}
+          oci: true
+          context:
+            ${{ env.K8S_TOOLS_IMG_DIR }}
+          dockerfiles:
+            ${{ env.K8S_TOOLS_IMG_DIR }}/Dockerfile
+          build-args: |
+            BASE_IMG=${{ env.BASE_IMG }}
+
+      - name: Push K8s tools image
+        uses: redhat-actions/push-to-registry@v2
+        if: steps.commit_data.outputs.is_pr == 'false'
+        with:
+          image: ${{ env.K8S_TOOLS_IMG_NAME }}
+          tags: ${{ env.IMG_TAGS }}
           registry: ${{ env.REGISTRY_URL }}
           username: ${{ env.REGISTRY_USER }}
           password: ${{ secrets.QUAY_TOKEN }}

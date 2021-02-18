@@ -1,0 +1,29 @@
+ARG BASE_IMG=quay.io/redhat-github-actions/runner:latest
+
+FROM $BASE_IMG AS k8s-tools-runner
+
+# Must match base dockerfile - should be shared
+ARG UID=1001
+USER root
+
+ARG HELM_VERSION="3.5.2"
+ENV HELM_VERSION=${HELM_VERSION}
+
+ARG KN_VERSION="0.20.0"
+ENV KN_VERSION=${KN_VERSION}
+
+ARG KUBECTL_VERSION="1.20.3"
+ENV KUBECTL_VERSION=${KUBECTL_VERSION}
+
+ARG OC_VERSION="4.6.18"
+ENV OC_VERSION=${OC_VERSION}
+
+ARG TKN_VERSION="0.16.0"
+ENV TKN_VERSION=${TKN_VERSION}
+
+COPY ./install-tools.sh .
+
+RUN ./install-tools.sh
+RUN rm ./install-tools.sh
+
+USER $UID
