@@ -1,12 +1,12 @@
 #!/usr/bin/env bash
 
 INSTALLER_TMP=/tmp/tool-installer/
-INSTALL_TARGET=/usr/local/bin/
+INSTALL_TARGET_DIR=/usr/local/bin/
 
-if [[ -n $DEV_INSTALL_TARGET ]]; then
+if [[ -n $DEV_INSTALL_TARGET_DIR ]]; then
     # Use this for testing the script without installing into your system dirs
-    echo "Using override install target $DEV_INSTALL_TARGET"
-    INSTALL_TARGET=$DEV_INSTALL_TARGET
+    echo "Using override install target $DEV_INSTALL_TARGET_DIR"
+    INSTALL_TARGET_DIR=$DEV_INSTALL_TARGET_DIR
 fi
 
 die() {
@@ -56,9 +56,9 @@ move_executable() {
     local executable_path=$1
     local executable_name=$2
     chmod a+x $executable_path
-    mv -v $executable_path $INSTALL_TARGET/$executable_name
+    mv -v $executable_path $INSTALL_TARGET_DIR$executable_name
 
-    echo "Installed $executable_name to $INSTALL_TARGET"
+    echo "Installed $executable_name to $INSTALL_TARGET_DIR"
 }
 
 install() {
@@ -98,6 +98,7 @@ install() {
 
     move_executable $executable_path $executable_name
     rm -fv $download_filename
+
     echo
     echo "========================================"
 }
@@ -120,6 +121,9 @@ install oc ${MIRROR}/ocp/${OC_VERSION}/openshift-client-linux.tar.gz
 
 assert_env_var "TKN_VERSION"
 install tkn ${MIRROR}/pipeline/${TKN_VERSION}/tkn-linux-amd64-${TKN_VERSION}.tar.gz
+
+assert_env_var "YQ_VERSION"
+install yq https://github.com/mikefarah/yq/releases/download/v${YQ_VERSION}/yq_linux_amd64.tar.gz
 
 echo "Removing $INSTALLER_TMP"
 rm -rf $INSTALLER_TMP
