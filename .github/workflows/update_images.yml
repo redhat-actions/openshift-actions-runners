@@ -1,8 +1,6 @@
 name: Update Runner Images
 on:
   push:
-    branches: [ "*" ]
-    tags: [ "*" ]
   pull_request:
 
 env:
@@ -26,10 +24,51 @@ jobs:
     steps:
       - uses: actions/checkout@v2
 
-      - uses: tetchel/commit-data@v1
+      - uses: redhat-actions/common/commit-data@v1
         id: commit_data
 
+      - uses: lots0logs/gh-action-get-changed-files@2.1.4
+        id: get_changed_files
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Determine changed directories
+        id: is_dir_changed
+        uses: actions/github-script@v3
+        with:
+          script: |
+            const changedFiles = ${{ steps.get_changed_files.outputs.all }};
+            console.log(`Changed files: ${JSON.stringify(changedFiles)}`);
+
+            const BASE = "base";
+            const dirsChanged = {
+              [BASE]: false,
+              buildah: false,
+              "k8s-tools": false
+            };
+
+            Object.keys(dirsChanged).forEach((dir) => {
+              const changed = changedFiles.find((changedFile) => changedFile.startsWith(dir + "/")) != null;
+              dirsChanged[dir] = changed;
+            });
+
+            if (dirsChanged[BASE]) {
+              console.log("Base image changed; all images will be rebuilt.");
+            }
+
+            Object.keys(dirsChanged).forEach((dir) => {
+              const changed = dirsChanged[BASE] || dirsChanged[dir];
+
+              const outputName = dir + "_changed";
+              console.log(`${outputName}=${changed}`)
+              core.exportVariable(outputName, changed);
+            });
+
+            // const anyChanged = Object.entries(dirsChanged).find(([k, v] => dirsChanged[k]));
+            return dirsChanged;
+
       - name: Determine tag
+        shell: bash
         run: |
           export IMG_TAGS=latest
           export GIT_TAG="${{ steps.commit_data.outputs.tag }}"
@@ -51,9 +90,19 @@ jobs:
           echo "BRANCH=$BRANCH" >> $GITHUB_ENV
           echo "Tagging images with '$IMG_TAGS'"
 
+      # The child image builds are done on the same machine so that it doesn't have to pull the updated base image; it's already there locally.
+      - name: Determine image to build child images from
+        shell: bash
+        run: |
+          export FIRST_TAG=$(echo "${{ env.IMG_TAGS }}" | awk '{ print $1 }')
+          export BASE_IMG=${{ env.REGISTRY_URL }}/${{ env.BASE_IMG_NAME }}:$FIRST_TAG
+          echo "Child images will be build from '$BASE_IMG'"
+          echo BASE_IMG=$BASE_IMG >> $GITHUB_ENV
+
       - name: Build base image
-        id: build_base_img
+        if: env.base_changed == 'true'
         uses: redhat-actions/buildah-build@v2
+        id: build_base_img
         with:
           image: ${{ env.BASE_IMG_NAME }}
           tags: ${{ env.IMG_TAGS }}
@@ -64,8 +113,8 @@ jobs:
             ${{ env.BASE_IMG_DIR }}/Dockerfile
 
       - name: Push base image
+        if: steps.commit_data.outputs.is_pr == 'false' && env.base_changed == 'true'
         uses: redhat-actions/push-to-registry@v2
-        if: steps.commit_data.outputs.is_pr == 'false'
         with:
           image: ${{ env.BASE_IMG_NAME }}
           tags: ${{ env.IMG_TAGS }}
@@ -73,15 +122,8 @@ jobs:
           username: ${{ env.REGISTRY_USER }}
           password: ${{ secrets.QUAY_TOKEN }}
 
-      # The buildah image is done on the same machine so that it doesn't have to pull the updated base image; it's already there locally.
-      - name: Determine image to build sub-images FROM
-        run: |
-          export FIRST_TAG=$(echo "${{ steps.build_base_img.outputs.tags }}" | awk '{ print $1 }')
-          export BASE_IMG=${{ steps.build_base_img.outputs.image }}:$FIRST_TAG
-          echo "Child images will be build from '$BASE_IMG'"
-          echo BASE_IMG=$BASE_IMG >> $GITHUB_ENV
-
       - name: Build buildah image
+        if: env.buildah_changed == 'true'
         uses: redhat-actions/buildah-build@v2
         with:
           image: ${{ env.BUILDAH_IMG_NAME }}
@@ -95,8 +137,8 @@ jobs:
             BASE_IMG=${{ env.BASE_IMG }}
 
       - name: Push buildah image
+        if: steps.commit_data.outputs.is_pr == 'false' && env.buildah_changed == 'true'
         uses: redhat-actions/push-to-registry@v2
-        if: steps.commit_data.outputs.is_pr == 'false'
         with:
           image: ${{ env.BUILDAH_IMG_NAME }}
           tags: ${{ env.IMG_TAGS }}
@@ -105,6 +147,7 @@ jobs:
           password: ${{ secrets.QUAY_TOKEN }}
 
       - name: Build K8s tools image
+        if: env.k8s-tools_changed == 'true'
         uses: redhat-actions/buildah-build@v2
         with:
           image: ${{ env.K8S_TOOLS_IMG_NAME }}
@@ -118,8 +161,8 @@ jobs:
             BASE_IMG=${{ env.BASE_IMG }}
 
       - name: Push K8s tools image
+        if: steps.commit_data.outputs.is_pr == 'false' && env.k8s-tools_changed == 'true'
         uses: redhat-actions/push-to-registry@v2
-        if: steps.commit_data.outputs.is_pr == 'false'
         with:
           image: ${{ env.K8S_TOOLS_IMG_NAME }}
           tags: ${{ env.IMG_TAGS }}
