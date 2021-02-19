@@ -1,11 +1,6 @@
 ARG BASE_IMG=quay.io/redhat-github-actions/runner:latest
-
 FROM $BASE_IMG AS buildah-runner
 
-# ARG BUILDAH_RPM=https://download.opensuse.org/repositories/devel:/kubic:/libcontainers:/stable/CentOS_7/x86_64/buildah-1.18.0-2.el7.x86_64.rpm
-
-# Must match base dockerfile - should be shared
-ARG UID=1001
 USER root
 
 # Some complex config is required to allow buildah to run in a nonprivileged container.
@@ -17,14 +12,11 @@ RUN dnf -y install shadow-utils xz slirp4netns buildah podman --exclude containe
 
 ADD https://raw.githubusercontent.com/containers/buildah/master/contrib/buildahimage/stable/containers.conf /etc/containers/
 RUN chgrp -R 0 /etc/containers/ && \
-    chmod -R a+r /etc/containers/
-
-# prevents errors from failing to log using systemd https://github.com/containers/podman/issues/4325#issuecomment-570650857
-# See https://github.com/containers/common/blob/master/docs/containers.conf.5.md for valid configurations
-RUN echo 'events_logger = "file"' >> /etc/containers/containers.conf
-
-# This should allow buildah/podman
-RUN echo "user.max_user_namespaces=15000" > /etc/sysctl.d/userns.conf
+    chmod -R a+r /etc/containers/ && \
+    # prevents errors from failing to log using systemd https://github.com/containers/podman/issues/4325#issuecomment-570650857
+    # See https://github.com/containers/common/blob/master/docs/containers.conf.5.md for valid configurations
+    echo 'events_logger = "file"' >> /etc/containers/containers.conf && \
+    echo "user.max_user_namespaces=15000" > /etc/sysctl.d/userns.conf
 
 # Fuse storage does not work in k8s. We have to use vfs.
 ENV STORAGE_DRIVER=vfs
@@ -39,7 +31,4 @@ ENV STORAGE_DRIVER=vfs
 # isolate the filesystem with chroot.
 ENV _BUILDAH_STARTED_IN_USERNS="" BUILDAH_ISOLATION=chroot
 
-# ENTRYPOINT /bin/sh
-
-# Numeric user ID is required to enforce runAsNonRoot security policy
 USER $UID

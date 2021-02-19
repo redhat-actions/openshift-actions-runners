@@ -1,4 +1,4 @@
-name: Markdown link check
+name: Link checker
 on:
   push:
     paths:

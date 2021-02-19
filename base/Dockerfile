@@ -5,8 +5,11 @@ RUN dnf -y --setopt=skip_missing_names_on_install=False install \
     curl git jq hostname procps findutils && \
     dnf clean all
 
-ARG USER=runner
 ARG UID=1001
+# The UID env var should be used in child dockerfiles.
+ENV UID=$UID
+ARG USER=runner
+ENV USER_NAME=$USER
 ARG RUNNER_WORKDIR=/home/${USER}/_work
 
 # Override these when creating the container.
@@ -44,5 +47,4 @@ RUN chmod -v ug+x *.sh
 
 USER $UID:0
 
-ENV USER_NAME=$USER
 ENTRYPOINT ./entrypoint.sh

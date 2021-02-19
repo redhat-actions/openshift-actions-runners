@@ -5,7 +5,7 @@
 # https://docs.openshift.com/container-platform/3.3/creating_images/guidelines.html#openshift-container-platform-specific-guidelines
 # https://www.openshift.com/blog/jupyter-on-openshift-part-6-running-as-an-assigned-user-id
 
-set -eE -o pipefail
+set -eE
 
 uid=$(id -u)
 gid=$(id -g)

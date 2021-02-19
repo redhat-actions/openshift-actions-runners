@@ -1,10 +1,10 @@
 
 #!/bin/sh
-# source: https://github.com/bbrowning/github-runner/blob/master/entrypoint.sh
+# Based on https://github.com/bbrowning/github-runner/blob/master/entrypoint.sh
 
-set -eE -o pipefail
+./uid.sh > /tmp/uid.sh.log
 
-./uid.sh > /tmp/uid.sh.log 2>&1
+set -eE
 
 if [ -z "${GITHUB_OWNER:-}" ]; then
     echo "Fatal: \$GITHUB_OWNER must be set in the environment"
