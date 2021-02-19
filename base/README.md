@@ -1,6 +1,6 @@
 # Base Actions Runner
 
-[![Quay org](https://img.shields.io/badge/quay-redhat--github--actions%2Frunner-red)](https://quay.io/repository/redhat-github-actions/k8s-tools-runner)
+[![Quay org](https://img.shields.io/badge/quay-redhat--github--actions%2Frunner-red)](https://quay.io/repository/redhat-github-actions/runner)
 
 The base actions runner is meant to be minimal. It is build from [`fedora:33`](https://hub.docker.com/_/fedora), and contains the [GitHub Actions Runner](https://github.com/actions/runner/) and all its dependencies. At image build time, the latest runner version [is downloaded](./get-runner-release.sh), and the runner self-updates when it is connected to GitHub.
 
