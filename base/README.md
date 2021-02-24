@@ -39,7 +39,8 @@ For example, one could build a runner image that includes a Node runtime in just
 FROM quay.io/redhat-github-actions/runner:latest as runner
 
 USER root
-# https://nodejs.org/en/download/package-manager/#centos-fedora-and-red-hat-enterprise-linux
 RUN dnf module install -y nodejs:14/default
 USER $UID
 ```
+
+Just like that, we have created the [Node runner image](../node/).

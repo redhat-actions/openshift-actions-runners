@@ -1,5 +1,4 @@
 ARG BASE_IMG=quay.io/redhat-github-actions/runner:latest
-
 FROM $BASE_IMG AS k8s-tools-runner
 
 # Must match base dockerfile - should be shared
