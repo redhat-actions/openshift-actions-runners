@@ -19,7 +19,8 @@ Some basic CLI tools are installed in addition to what's in the parent Fedora im
 - `jq`
 - `procps` (`ps`, `pgrep`)
 
-## Creating your own runner image
+<a id="own-image"></a>
+## Building your own runner image
 
 You can create your own runner image based on this one, and install any runtimes and tools your workflows need.
 
@@ -29,7 +30,7 @@ You can create your own runner image based on this one, and install any runtimes
     - The `UID` environment variable is set in the base Dockerfile.
     - Do not override the `ENTRYPOINT`.
 3. Build and push your new runner image.
-4. Install [OpenShift Action Runner Chart](https://github.com/redhat-actions/openshift-actions-runner-chart) but set the value `runnerImage` to your image, and `runnerTag` to your tag.
+4. Install [OpenShift Action Runner Chart](https://github.com/redhat-actions/openshift-actions-runner-chart). Set the value `runnerImage` to your image, and `runnerTag` to your tag.
 
 Remember to pull the base image before running the container build to make sure you are building from an up-to-date image.
 

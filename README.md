@@ -31,6 +31,8 @@ To register themselves with GitHub, the runners require a [GitHub Personal Acces
 - If the runner will be for an organization, the token must also have the `admin:org` permission scope.
 - [See an example](./pat-creation.png).
 
+## Building your own runner image
+See the [base image README](./base/#own-image).
 
 ## Running Locally
 You can run the images locally to test and develop.
