@@ -3,7 +3,7 @@
 [![Quay org](https://img.shields.io/badge/quay-redhat--github--actions%2Fk8s--tools--runner-red)](https://quay.io/repository/redhat-github-actions/k8s-tools-runner)
 
 
-The Kubernetes tools runner includes a set of CLIs used to work with OpenShift/Kubernetes clusters.
+The Kubernetes tools runner is the [base runner](../base) plus a set of CLIs used to work with OpenShift/Kubernetes clusters.
 
 The version of each tool to install can be edited using a Docker `--build-arg`. View the [Dockerfile](./Dockerfile) to see the build args to use.
 
