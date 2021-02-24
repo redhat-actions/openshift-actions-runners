@@ -16,10 +16,10 @@ env:
   K8S_TOOLS_IMG_NAME: k8s-tools-runner
   K8S_TOOLS_IMG_DIR: k8s-tools
 
-  NODE_IMG_NAME: node-14-runner
+  NODE_IMG_NAME: node-runner-14
   NODE_IMG_DIR: node
 
-  JAVA_IMG_NAME: java-11-runner
+  JAVA_IMG_NAME: java-runner-11
   JAVA_IMG_DIR: java
 
 jobs:
