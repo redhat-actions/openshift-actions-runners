@@ -60,12 +60,18 @@ jobs:
               dirsChanged[dir] = changed;
             });
 
-            if (dirsChanged[BASE]) {
+            let rebuildAll = false;
+            if (context.ref.startsWith("refs/tags/")) {
+              console.log(`Tag build; all images will be rebuilt.`);
+              rebuildAll = true;
+            }
+            else if (dirsChanged[BASE]) {
               console.log("Base image changed; all images will be rebuilt.");
+              rebuildAll = true;
             }
 
             Object.keys(dirsChanged).forEach((dir) => {
-              const changed = dirsChanged[BASE] || dirsChanged[dir];
+              const changed = rebuildAll || dirsChanged[dir];
 
               const outputName = (dir + "_changed").toUpperCase();
               console.log(`${outputName}=${changed}`)
@@ -75,7 +81,7 @@ jobs:
             // const anyChanged = Object.entries(dirsChanged).find(([k, v] => dirsChanged[k]));
             return dirsChanged;
 
-      - name: Determine tag
+      - name: Determine image tag
         shell: bash
         run: |
           export IMG_TAGS=latest
@@ -108,7 +114,7 @@ jobs:
           echo BASE_IMG=$BASE_IMG >> $GITHUB_ENV
 
       - name: Build base image
-        if: env.base_changed == 'true'
+        if: env.BASE_CHANGED == 'true'
         uses: redhat-actions/buildah-build@v2
         id: build_base_img
         with:
@@ -121,7 +127,7 @@ jobs:
             ${{ env.BASE_IMG_DIR }}/Dockerfile
 
       - name: Push base image
-        if: steps.commit_data.outputs.is_pr == 'false' && env.base_changed == 'true'
+        if: steps.commit_data.outputs.is_pr == 'false' && env.BASE_CHANGED == 'true'
         uses: redhat-actions/push-to-registry@v2
         with:
           image: ${{ env.BASE_IMG_NAME }}
