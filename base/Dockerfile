@@ -1,7 +1,8 @@
 FROM fedora:33
 
 # Adapted from https://github.com/bbrowning/github-runner/blob/master/Dockerfile
-RUN dnf -y --setopt=skip_missing_names_on_install=False install \
+RUN dnf -y upgrade --security && \
+    dnf -y --setopt=skip_missing_names_on_install=False install \
     curl git jq hostname procps findutils && \
     dnf clean all
 

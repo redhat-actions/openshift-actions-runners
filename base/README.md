@@ -8,8 +8,6 @@ On OpenShift, containers run as a dynamically assigned user ID You can read abou
 
 The [`entrypoint.sh`](./entrypoint.sh) acquires a GitHub Self Hosted Runner token using your GitHub PAT. The token is used to register the runner with GitHub, and connect to start listening for jobs on the organization or repository you specify.
 
-The image build does not run `dnf update` or `dnf upgrade`, in order to maintain consistency between different image versions and reduce image size.
-
 Some basic CLI tools are installed in addition to what's in the parent Fedora image.
 
 - `curl`
