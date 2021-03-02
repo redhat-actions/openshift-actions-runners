@@ -9,6 +9,7 @@ RUN dnf -y upgrade --security && \
 ARG UID=1001
 # The UID env var should be used in child dockerfiles.
 ENV UID=$UID
+ENV GID=0
 ARG USER=runner
 ENV USER_NAME=$USER
 ARG RUNNER_WORKDIR=/home/${USER}/_work
@@ -46,6 +47,6 @@ RUN chown -R ${USER}:0 /home/$USER/ && \
 COPY --chown=${USER}:0 entrypoint.sh uid.sh ./
 RUN chmod -v ug+x *.sh
 
-USER $UID:0
+USER $UID:$GID
 
 ENTRYPOINT ./entrypoint.sh
