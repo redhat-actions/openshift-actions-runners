@@ -6,19 +6,33 @@ The Buildah/Podman Actions Runner extends the [base runner](../base) to include 
 
 In order for OpenShift containers to run Buildah and Podman, the user or ServiceAccount that deploys the pod must have permission to deploy using the `anyuid` SecurityContextConstraint (SCC).
 
-If a non-administrator user is deploying the pod, an administrator must give that user permission:
-```
-oc adm policy add-scc-to-group anyuid <user>
+Buildah has a [very good tutorial](https://github.com/containers/buildah/blob/master/docs/tutorials/05-openshift-rootless-bud.md) detailing how to run buildah in OpenShift.
+
+You can also refer to the OpenShift documentation [Managing Security Context Constraints](https://docs.openshift.com/container-platform/4.6/authentication/managing-security-context-constraints.html), and [this blog post](https://www.openshift.com/blog/managing-sccs-in-openshift).
+
+## Deploying the buildah pod
+
+It is recommended to deploy the pod using a ServiceAccount specicially configured to have the required permissions. An administrator must run:
+
+```bash
+# Create the ServiceAccount (if needed)
+$ oc create -f - <<EOF
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: buildah-sa
+EOF
+
+serviceaccount/buildah-sa created
+
+# Give the ServiceAccount permission to deploy with the anyuid scc.
+$ oc adm policy add-scc-to-user anyuid -z buildah-sa
 ```
 
-where `<user>` is the user who will deploy the buildah pod.
-
-The pod could also be deployed by a ServiceAccount. In this case, run:
+Or, an adminstrator can give a specific user permission:
 ```
-oc adm policy add-scc-to-user anyuid -z <serviceaccount>
+oc adm policy add-scc-to-user anyuid <user>
 ```
-
-Refer to the documentation at [Managing Security Context Constraints](https://docs.openshift.com/container-platform/4.6/authentication/managing-security-context-constraints.html), and [this blog post](https://www.openshift.com/blog/managing-sccs-in-openshift).
 
 ## Podman run
 `podman run` doesn't work unless the pod is created with the `privileged` SCC.
