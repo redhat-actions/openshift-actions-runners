@@ -4,31 +4,38 @@ FROM $BASE_IMG AS buildah-runner
 USER root
 
 # Some complex config is required to allow buildah to run in a nonprivileged container.
-# Most of below is from https://github.com/containers/buildah/blob/master/contrib/buildahimage/centos7/Dockerfile
-# Also see https://github.com/containers/buildah/issues/1011
+# https://github.com/containers/buildah/blob/master/docs/tutorials/05-openshift-rootless-bud.md
+# https://github.com/containers/buildah/blob/master/contrib/buildahimage/stable/Dockerfile
+# https://github.com/containers/buildah/issues/1011
 
-RUN dnf -y install shadow-utils xz slirp4netns buildah podman --exclude container-selinux --exclude fuse-overlayfs && \
+RUN dnf -y install shadow-utils xz slirp4netns buildah podman fuse-overlayfs --exclude container-selinux && \
     dnf clean all
 
+ENV BUILDAH_ISOLATION=chroot
+
 ADD https://raw.githubusercontent.com/containers/buildah/master/contrib/buildahimage/stable/containers.conf /etc/containers/
+
+# ADD https://raw.githubusercontent.com/containers/buildah/master/contrib/buildahimage/stable/containers.conf /etc/containers/
 RUN chgrp -R 0 /etc/containers/ && \
     chmod -R a+r /etc/containers/ && \
+    chmod -R g+w /etc/containers/
+    # echo "user.max_user_namespaces=65536" > /etc/sysctl.d/userns.conf && \
     # prevents errors from failing to log using systemd https://github.com/containers/podman/issues/4325#issuecomment-570650857
     # See https://github.com/containers/common/blob/master/docs/containers.conf.5.md for valid configurations
-    echo 'events_logger = "file"' >> /etc/containers/containers.conf && \
-    echo "user.max_user_namespaces=15000" > /etc/sysctl.d/userns.conf
+    # printf '[engine]\nevents_logger = "file"\n' >> /etc/containers/containers.conf
+    # printf 'events_logger = "file"\n' >> /etc/containers/containers.conf
 
-# Fuse storage does not work in k8s. We have to use vfs.
-ENV STORAGE_DRIVER=vfs
+# Adjust storage.conf to enable Fuse storage.
+RUN chmod 644 /etc/containers/containers.conf; sed -i -e 's|^#mount_program|mount_program|g' -e '/additionalimage.*/a "/var/lib/shared",' -e 's|^mountopt[[:space:]]*=.*$|mountopt = "nodev,fsync=0"|g' /etc/containers/storage.conf
+RUN mkdir -p /var/lib/shared/overlay-images /var/lib/shared/overlay-layers /var/lib/shared/vfs-images /var/lib/shared/vfs-layers; touch /var/lib/shared/overlay-images/images.lock; touch /var/lib/shared/overlay-layers/layers.lock; touch /var/lib/shared/vfs-images/images.lock; touch /var/lib/shared/vfs-layers/layers.lock
 
-# These are used to enable fuse storage which is used for buildah-in-docker, but doesn't work in k8s.
-# If trying to use fuse, also note it's excluded from the buildah installation above.
-# RUN sed -i -e 's|^#mount_program|mount_program|g' -e '/additionalimage.*/a "/var/lib/shared",' /etc/containers/storage.conf
-# RUN mkdir -p /var/lib/shared/overlay-images /var/lib/shared/overlay-layers; touch /var/lib/shared/overlay-images/images.lock; touch /var/lib/shared/overlay-layers/layers.lock
+# Use VFS since fuse does not work
+# https://github.com/containers/buildah/blob/master/vendor/github.com/containers/storage/storage.conf
+RUN mkdir -vp /home/${USERNAME}/.config/containers && \
+    printf '[storage]\ndriver = "vfs"\n' > /home/${USERNAME}/.config/containers/storage.conf && \
+    chown -Rv ${USERNAME} /home/${USERNAME}/.config/
 
-# Set up environment variables to note that this is
-# not starting with usernamespace and default to
-# isolate the filesystem with chroot.
-ENV _BUILDAH_STARTED_IN_USERNS="" BUILDAH_ISOLATION=chroot
+RUN printf "${USERNAME}:2000:50000\n" > /etc/subuid
+RUN printf "${USERNAME}:2000:50000\n" > /etc/subgid
 
 USER $UID

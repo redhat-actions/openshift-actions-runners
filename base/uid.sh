@@ -5,11 +5,11 @@
 # https://docs.openshift.com/container-platform/3.3/creating_images/guidelines.html#openshift-container-platform-specific-guidelines
 # https://www.openshift.com/blog/jupyter-on-openshift-part-6-running-as-an-assigned-user-id
 
-set -eE
+set -eEu
 
 uid=$(id -u)
 gid=$(id -g)
-username=${USER_NAME:-default}
+username=${USERNAME:-default}
 
 echo "Current user has ID ${uid} and GID ${gid}"
 
@@ -28,20 +28,21 @@ else
 fi
 
 echo "whoami=$(whoami)"
-echo "groups=$(groups)"
+echo "groups=$(groups 2>/dev/null)"
 
 set +x
-if ! grep $username /etc/subuid &> /dev/null; then
+#if ! grep $username /etc/subuid &> /dev/null; then
   echo "Creating sub{u,g}id entries for $username"
   subuids_start=$(expr $uid + 1000)
   subgids_start=$(expr $gid + 1000)
 
-  # Openshift allows a range of 10000 u/g IDs, so we have to stay under that limit.
-  echo "${username}:${subuids_start}:65536" >> /etc/subuid
-  echo "${username}:${subgids_start}:65536" >> /etc/subgid
-else
-  echo "subuid entry already exists for $username"
-fi
+  no_subids=50000
+
+  echo "${username}:${subuids_start}:${no_subids}" | tee /etc/subuid
+  echo "${username}:${subgids_start}:${no_subids}" | tee /etc/subgid
+#else
+#  echo "subuid entry already exists for $username"
+#fi
 
 # set -x
 # tail -n +1 /etc/sub{u,g}id

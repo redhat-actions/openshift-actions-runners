@@ -10,25 +10,30 @@ BASE_IMG=${REGISTRY}/runner:${TAG}
 BUILDAH_IMG=${REGISTRY}/buildah-runner:${TAG}
 K8S_TOOLS_IMG=${REGISTRY}/k8s-tools-runner:${TAG}
 
+echo "Base img tag $BASE_IMG"
+
 enabled() {
     [[ $1 == *$2* ]]
 }
 
 cd $(dirname $0)
 
-echo "Building base image..."
-docker build ./base -f ./base/Dockerfile -t $BASE_IMG
+if enabled "$*" base; then
+    echo "Building base image..."
+    docker build -f ./base/Dockerfile -t $BASE_IMG ./base
+fi
 
 if enabled "$*" buildah; then
     echo "Building buildah image..."
-    docker build ./buildah -f ./buildah/Dockerfile -t $BUILDAH_IMG
+    docker build -f ./buildah/Dockerfile -t $BUILDAH_IMG ./buildah
 fi
 if enabled "$*" k8s; then
     echo "Building K8s image..."
-    docker build ./k8s-tools -f ./k8s-tools/Dockerfile -t $K8S_TOOLS_IMG
+    docker build -f ./k8s-tools/Dockerfile -t $K8S_TOOLS_IMG ./k8s-tools
 fi
 
 if enabled "$*" push; then
+    echo "Pushing..."
     docker push $BASE_IMG
 
     if enabled "$*" buildah; then
