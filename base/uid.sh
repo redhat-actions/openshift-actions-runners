@@ -21,7 +21,6 @@ if ! whoami &> /dev/null; then
     tail -n 1 /etc/passwd
   else
     echo "No write permission to /etc/passwd!" 1>&2
-    exit 1
   fi
 else
   echo "User already has passwd entry"
@@ -31,18 +30,16 @@ echo "whoami=$(whoami)"
 echo "groups=$(groups 2>/dev/null)"
 
 set +x
-#if ! grep $username /etc/subuid &> /dev/null; then
-  echo "Creating sub{u,g}id entries for $username"
-  subuids_start=$(expr $uid + 1000)
-  subgids_start=$(expr $gid + 1000)
+echo "Creating sub{u,g}id entries for $username"
+subuids_start=$(expr $uid + 1000)
+subgids_start=$(expr $gid + 1000)
 
-  no_subids=50000
+# Do not allocate too many.
+# https://github.com/containers/buildah/issues/3053
+no_subids=50000
 
-  echo "${username}:${subuids_start}:${no_subids}" | tee /etc/subuid
-  echo "${username}:${subgids_start}:${no_subids}" | tee /etc/subgid
-#else
-#  echo "subuid entry already exists for $username"
-#fi
+echo "${username}:${subuids_start}:${no_subids}" | tee /etc/subuid
+echo "${username}:${subgids_start}:${no_subids}" | tee /etc/subgid
 
 # set -x
 # tail -n +1 /etc/sub{u,g}id
