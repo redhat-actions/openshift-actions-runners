@@ -1,8 +1,6 @@
 ARG BASE_IMG=quay.io/redhat-github-actions/runner:latest
 FROM $BASE_IMG AS k8s-tools-runner
 
-# Must match base dockerfile - should be shared
-ARG UID=1001
 USER root
 
 ARG HELM_VERSION="3.5.0"
