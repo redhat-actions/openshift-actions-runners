@@ -8,11 +8,12 @@ USER root
 # https://github.com/containers/buildah/issues/1011
 # https://github.com/containers/buildah/issues/3053
 
-RUN dnf -y install  xz slirp4netns buildah podman fuse-overlayfs --exclude container-selinux && \
+RUN dnf -y install xz slirp4netns buildah podman fuse-overlayfs --exclude container-selinux && \
     dnf -y reinstall shadow-utils && \
     dnf clean all
 
 ENV BUILDAH_ISOLATION=chroot
+ENV BUILDAH_LAYERS=true
 
 ADD https://raw.githubusercontent.com/containers/buildah/master/contrib/buildahimage/stable/containers.conf /etc/containers/
 
