@@ -12,6 +12,11 @@ RUN dnf -y install xz slirp4netns buildah podman fuse-overlayfs --exclude contai
     dnf -y reinstall shadow-utils && \
     dnf clean all
 
+ARG OC_VERSION=4.7.4
+RUN curl -sSLf https://mirror.openshift.com/pub/openshift-v4/x86_64/clients/ocp/${OC_VERSION}/openshift-client-linux.tar.gz \
+    | tar --exclude=README.md -xzvf - &&\
+    mv kubectl oc /usr/local/bin/
+
 ENV BUILDAH_ISOLATION=chroot
 ENV BUILDAH_LAYERS=true
 
