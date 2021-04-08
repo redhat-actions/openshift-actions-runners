@@ -33,13 +33,6 @@ To register themselves with GitHub, the runners require a [GitHub Personal Acces
 - If the runner will be for an organization, the token must also have the `admin:org` permission scope.
 - [See an example](./pat-creation.png).
 
-### GitHub Enterprise Support
-You can use any of the runners on your GitHub Enterprise server by overriding `GITHUB_DOMAIN` in the environment, using `docker run --env` or using the [chart](https://github.com/redhat-actions/openshift-actions-runner-chart).
-
-For example: `GITHUB_DOMAIN=github.mycompany.com`.
-
-The runner entrypoint will then try and register itself with `https://github.mycompany.com/$GITHUB_OWNER/$GITHUB_REPOSITORY`.
-
 ## Building your own runner image
 See the [base image README](./base/#own-image).
 
@@ -59,6 +52,28 @@ docker run \
 Or, to run a shell for debugging:
 ```sh
 docker run -it --entrypoint=/bin/bash quay.io/redhat-github-actions/runner:v1.0.0
+```
+
+<a id="enterprise-support"></a>
+
+## GitHub Enterprise Support
+You can use any of the runners on your GitHub Enterprise server by overriding `GITHUB_DOMAIN` in the environment, using `docker run --env` or using the [chart](https://github.com/redhat-actions/openshift-actions-runner-chart).
+
+For example, if you set:
+```
+GITHUB_DOMAIN=github.mycompany.com
+```
+
+the runner entrypoint will then try and register itself with
+
+```
+https://github.mycompany.com/$GITHUB_OWNER/$GITHUB_REPOSITORY
+```
+
+and use the GitHub API at
+
+```
+https://github.mycompany.com/api/v3/
 ```
 
 ## Troubleshooting
