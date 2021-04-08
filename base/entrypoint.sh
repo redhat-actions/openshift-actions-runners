@@ -14,24 +14,31 @@ elif [ -z "${GITHUB_PAT:-}" ]; then
     exit 1
 fi
 
+if [ -z "${GITHUB_DOMAIN:-}" ]; then
+    echo "Connecting to public GitHub"
+    GITHUB_DOMAIN="github.com"
+else
+    echo "Connecting to GitHub server at '$GITHUB_DOMAIN'"
+fi
+
 if [ -z "${GITHUB_REPOSITORY:-}" ] && [ -n "${GITHUB_REPO:-}" ]; then
     GITHUB_REPOSITORY=$GITHUB_REPO
 fi
 
 # https://docs.github.com/en/free-pro-team@latest/rest/reference/actions#create-a-registration-token-for-an-organization
 
-registration_url="https://github.com/${GITHUB_OWNER}"
+registration_url="https://${GITHUB_DOMAIN}/${GITHUB_OWNER}"
 if [ -z "${RUNNER_TOKEN:-}" ]; then
     if [ -z "${GITHUB_REPOSITORY:-}" ]; then
         echo "Runner is scoped to organization '${GITHUB_OWNER}'"
-        echo "View runner status at https://github.com/organizations/${GITHUB_OWNER}/settings/actions"
+        echo "View runner status at https://${GITHUB_DOMAIN}/organizations/${GITHUB_OWNER}/settings/actions"
 
-        token_url="https://api.github.com/orgs/${GITHUB_OWNER}/actions/runners/registration-token"
+        token_url="https://api.${GITHUB_DOMAIN}/orgs/${GITHUB_OWNER}/actions/runners/registration-token"
     else
         echo "Runner is scoped to repository '${GITHUB_OWNER}/${GITHUB_REPOSITORY}'"
-        echo "View runner status at https://github.com/${GITHUB_OWNER}/${GITHUB_REPOSITORY}/settings/actions"
+        echo "View runner status at https://${GITHUB_DOMAIN}/${GITHUB_OWNER}/${GITHUB_REPOSITORY}/settings/actions"
 
-        token_url="https://api.github.com/repos/${GITHUB_OWNER}/${GITHUB_REPOSITORY}/actions/runners/registration-token"
+        token_url="https://api.${GITHUB_DOMAIN}/repos/${GITHUB_OWNER}/${GITHUB_REPOSITORY}/actions/runners/registration-token"
         registration_url="${registration_url}/${GITHUB_REPOSITORY}"
     fi
     echo "Obtaining runner token from ${token_url}"
