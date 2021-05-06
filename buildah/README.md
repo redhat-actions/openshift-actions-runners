@@ -29,6 +29,8 @@ serviceaccount/buildah-sa created
 $ oc adm policy add-scc-to-user anyuid -z buildah-sa
 ```
 
+Then, when using [the Helm chart](https://github.com/redhat-actions/openshift-actions-runner-chart) to install buildah runners, you can pass `--set serviceAccountName=buildah-sa`
+
 Or, an adminstrator can give a specific user permission:
 ```
 oc adm policy add-scc-to-user anyuid <user>
