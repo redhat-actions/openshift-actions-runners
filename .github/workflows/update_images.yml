@@ -2,6 +2,8 @@ name: Update Runner Images
 on:
   push:
   pull_request:
+  workflow_dispatch:
+
 
 env:
   REGISTRY_USER: redhat-github-actions+redhat_actions_ci_pusher
@@ -25,7 +27,7 @@ env:
 jobs:
   update_images:
     name: Update images
-    runs-on: ubuntu-18.04
+    runs-on: ubuntu-20.04
 
     steps:
       - uses: actions/checkout@v2
