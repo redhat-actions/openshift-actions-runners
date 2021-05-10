@@ -12,7 +12,7 @@ You can also refer to the OpenShift documentation [Managing Security Context Con
 
 ## Deploying the buildah pod
 
-It is recommended to deploy the pod using a ServiceAccount specicially configured to have the required permissions. An administrator must run:
+It is recommended to deploy the pod using a ServiceAccount specifically configured to have the required permissions. An administrator must run:
 
 ```bash
 # Create the ServiceAccount (if needed)

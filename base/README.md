@@ -28,7 +28,7 @@ You can create your own runner image based on this one, and install any runtimes
     - The `UID` environment variable is set in the base Dockerfile.
     - Do not override the `ENTRYPOINT`.
 3. Build and push your new runner image.
-4. Install [OpenShift Action Runner Chart](https://github.com/redhat-actions/openshift-actions-runner-chart). Set the value `runnerImage` to your image, and `runnerTag` to your tag.
+4. Install the [OpenShift Action Runner Chart](https://github.com/redhat-actions/openshift-actions-runner-chart). Set the value `runnerImage` to your image, and `runnerTag` to your tag.
 
 Remember to pull the base image before running the container build to make sure you are building from an up-to-date image.
 
