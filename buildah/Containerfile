@@ -8,7 +8,8 @@ USER root
 # https://github.com/containers/buildah/issues/1011
 # https://github.com/containers/buildah/issues/3053
 
-RUN dnf -y install xz slirp4netns buildah podman fuse-overlayfs --exclude container-selinux && \
+RUN dnf -y update && \
+    dnf -y install xz slirp4netns buildah podman fuse-overlayfs shadow-utils --exclude container-selinux && \
     dnf -y reinstall shadow-utils && \
     dnf clean all
 
