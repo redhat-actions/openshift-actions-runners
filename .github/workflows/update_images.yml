@@ -102,6 +102,8 @@ jobs:
             IMG_TAGS="${{ steps.commit_data.outputs.short_sha }}"
           fi
 
+          IMG_TAGS=${{ env.REGISTRY_URL }}/${{ env.REGISTRY_USER }}/${IMG_TAGS}
+
           echo "IMG_TAGS=$IMG_TAGS" >> $GITHUB_ENV
           echo "BRANCH=$BRANCH" >> $GITHUB_ENV
           echo "Tagging images with '$IMG_TAGS'"
