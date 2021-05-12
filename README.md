@@ -12,7 +12,7 @@ The [**OpenShift Actions Runner Chart**](https://github.com/redhat-actions/opens
 
 ## Runners
 1. The [**base runner**](./base) is based on Fedora. It is intended to have a fairly minimal tool set to keep the image size as small as possible. It has all the GitHub Actions Runner needs, plus a limited number of popular Unix command-line tools.
-2. The [**buildah runner**](./buildah) for a Containerfile which extends the base runner to add `buildah` and `podman`. This runner requires permissions that are disabled for by default on OpenShift. See [the buildah image README](./buildah/#README.md) for details.
+2. The [**buildah runner**](./buildah) extends the base runner to add `buildah` and `podman`. This runner requires permissions that are disabled for by default on OpenShift. See [the buildah image README](./buildah/#README.md) for details.
 3. The [**K8s tools runner**](./k8s-tools) installs a set of CLIs used to work with Kubernetes.
 4. The [**Node.js runner**](./node) includes a Node.js runtime.
 5. The [**Java runner**](./java) includes a JDK and JRE.
