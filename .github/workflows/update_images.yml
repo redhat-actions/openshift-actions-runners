@@ -106,13 +106,16 @@ jobs:
           echo "BRANCH=$BRANCH" >> $GITHUB_ENV
           echo "Tagging images with '$IMG_TAGS'"
 
-      # The child image builds are done on the same machine so that it doesn't have to pull the updated base image; it's already there locally.
-      - name: Determine image to build child images from
+      # The child image builds are done on the same machine so that
+      # it doesn't have to pull the updated base image; it's already there locally.
+      - name: Determine parent image name and tag
         shell: bash
         run: |
           export FIRST_TAG=$(echo "${{ env.IMG_TAGS }}" | awk '{ print $1 }')
-          export BASE_IMG=${{ env.REGISTRY_URL }}/${{ env.BASE_IMG_NAME }}:$FIRST_TAG
-          echo "Child images will be build from '$BASE_IMG'"
+
+          # export BASE_IMG=${{ env.REGISTRY_URL }}/${{ env.BASE_IMG_NAME }}:$FIRST_TAG
+          export BASE_IMG=${{ env.BASE_IMG_NAME }}:$FIRST_TAG
+          echo "Base image is '$BASE_IMG'"
           echo BASE_IMG=$BASE_IMG >> $GITHUB_ENV
 
       - name: Build base image
