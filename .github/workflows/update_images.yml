@@ -126,7 +126,7 @@ jobs:
           context:
             ${{ env.BASE_IMG_DIR }}
           dockerfiles:
-            ${{ env.BASE_IMG_DIR }}/Dockerfile
+            ${{ env.BASE_IMG_DIR }}/Containerfile
 
       - name: Push base image
         if: steps.commit_data.outputs.is_pr == 'false' && env.BASE_CHANGED == 'true'
@@ -167,7 +167,7 @@ jobs:
           context:
             ${{ env.BUILDAH_IMG_DIR }}
           dockerfiles:
-            ${{ env.BUILDAH_IMG_DIR }}/Dockerfile
+            ${{ env.BUILDAH_IMG_DIR }}/Containerfile
           build-args: |
             BASE_IMG=${{ env.BASE_IMG }}
 
@@ -197,7 +197,7 @@ jobs:
           context:
             ${{ env.K8S_TOOLS_IMG_DIR }}
           dockerfiles:
-            ${{ env.K8S_TOOLS_IMG_DIR }}/Dockerfile
+            ${{ env.K8S_TOOLS_IMG_DIR }}/Containerfile
           build-args: |
             BASE_IMG=${{ env.BASE_IMG }}
 
@@ -227,7 +227,7 @@ jobs:
           context:
             ${{ env.NODE_IMG_DIR }}
           dockerfiles:
-            ${{ env.NODE_IMG_DIR }}/Dockerfile
+            ${{ env.NODE_IMG_DIR }}/Containerfile
           build-args: |
             BASE_IMG=${{ env.BASE_IMG }}
 
@@ -257,7 +257,7 @@ jobs:
           context:
             ${{ env.JAVA_IMG_DIR }}
           dockerfiles:
-            ${{ env.JAVA_IMG_DIR }}/Dockerfile
+            ${{ env.JAVA_IMG_DIR }}/Containerfile
           build-args: |
             BASE_IMG=${{ env.BASE_IMG }}
 

@@ -5,7 +5,7 @@
 
 The Kubernetes tools runner is the [base runner](../base) plus a set of CLIs used to work with OpenShift/Kubernetes clusters.
 
-The version of each tool to install can be edited using a Docker `--build-arg`. View the [Dockerfile](./Dockerfile) to see the build args to use.
+The version of each tool to install can be edited using a Docker `--build-arg`. View the [Containerfile](./Containerfile) to see the build args to use.
 
 Since most tools are installed from the [OpenShift V4 mirror](https://mirror.openshift.com/pub/openshift-v4/clients/), make sure the desired version is available there first. Refer to the [install-tools](./install-tools.sh) script to see where each CLI is fetched from.
 

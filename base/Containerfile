@@ -1,12 +1,12 @@
 FROM fedora:33
 
-# Adapted from https://github.com/bbrowning/github-runner/blob/master/Dockerfile
+# Adapted from https://github.com/bbrowning/github-runner/blob/master/Containerfile
 RUN dnf -y upgrade --security && \
     dnf -y --setopt=skip_missing_names_on_install=False install \
     curl git jq hostname procps findutils && \
     dnf clean all
 
-# The UID env var should be used in child dockerfiles.
+# The UID env var should be used in child Containerfile.
 ENV UID=1000
 ENV GID=0
 ENV USERNAME="runner"

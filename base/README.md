@@ -22,10 +22,10 @@ Some basic CLI tools are installed in addition to what's in the parent Fedora im
 
 You can create your own runner image based on this one, and install any runtimes and tools your workflows need.
 
-1. Create your own Dockerfile, with `FROM quay.io/redhat-github-actions/runner:<tag>`.
-2. Edit the Dockerfile to install and set up your tools, environment, etc.
-    - If you have to use root in your Dockerfile, use `USER root` and convert back to `USER $UID` before the end of the Dockerfile.
-    - The `UID` environment variable is set in the base Dockerfile.
+1. Create your own Containerfile, with `FROM quay.io/redhat-github-actions/runner:<tag>`.
+2. Edit the Containerfile to install and set up your tools, environment, etc.
+    - If you have to use root in your Containerfile, use `USER root` and convert back to `USER $UID` before the end of the Containerfile.
+    - The `UID` environment variable is set in the base Containerfile.
     - Do not override the `ENTRYPOINT`.
 3. Build and push your new runner image.
 4. Install the [OpenShift Action Runner Chart](https://github.com/redhat-actions/openshift-actions-runner-chart). Set the value `runnerImage` to your image, and `runnerTag` to your tag.
@@ -33,7 +33,7 @@ You can create your own runner image based on this one, and install any runtimes
 Remember to pull the base image before running the container build to make sure you are building from an up-to-date image.
 
 For example, one could build a runner image that includes a Node runtime in just four lines.
-```Dockerfile
+```Containerfile
 FROM quay.io/redhat-github-actions/runner:latest as runner
 
 USER root
