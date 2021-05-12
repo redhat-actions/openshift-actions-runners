@@ -33,7 +33,7 @@ You can create your own runner image based on this one, and install any runtimes
 Remember to pull the base image before running the container build to make sure you are building from an up-to-date image.
 
 For example, one could build a runner image that includes a Node runtime in just four lines.
-```Containerfile
+```Dockerfile
 FROM quay.io/redhat-github-actions/runner:latest as runner
 
 USER root
