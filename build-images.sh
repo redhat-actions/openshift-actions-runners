@@ -20,16 +20,16 @@ cd $(dirname $0)
 
 if enabled "$*" base; then
     echo "Building base image..."
-    docker build -f ./base/Dockerfile -t $BASE_IMG ./base
+    docker build -f ./base/Containerfile -t $BASE_IMG ./base
 fi
 
 if enabled "$*" buildah; then
     echo "Building buildah image..."
-    docker build -f ./buildah/Dockerfile -t $BUILDAH_IMG ./buildah
+    docker build -f ./buildah/Containerfile -t $BUILDAH_IMG ./buildah
 fi
 if enabled "$*" k8s; then
     echo "Building K8s image..."
-    docker build -f ./k8s-tools/Dockerfile -t $K8S_TOOLS_IMG ./k8s-tools
+    docker build -f ./k8s-tools/Containerfile -t $K8S_TOOLS_IMG ./k8s-tools
 fi
 
 if enabled "$*" push; then

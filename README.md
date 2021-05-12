@@ -1,4 +1,4 @@
-# OpenShift GitHub Actions Runner
+# OpenShift GitHub Actions Runners
 
 [![Update Runner Images](https://github.com/redhat-actions/openshift-actions-runner/actions/workflows/update_images.yml/badge.svg)](https://github.com/redhat-actions/openshift-actions-runner/actions/workflows/update_images.yml)
 [![Link checker](https://github.com/redhat-actions/openshift-actions-runner/actions/workflows/link_check.yml/badge.svg)](https://github.com/redhat-actions/openshift-actions-runner/actions/workflows/link_check.yml)
@@ -6,13 +6,13 @@
 [![Tag](https://img.shields.io/github/v/tag/redhat-actions/openshift-actions-runner)](https://github.com/redhat-actions/openshift-actions-runner/tags)
 [![Quay org](https://img.shields.io/badge/quay-redhat--github--actions-red)](https://quay.io/organization/redhat-github-actions)
 
-This repository contains Dockerfiles for building container images that act as [self-hosted GitHub Action runners](https://docs.github.com/en/free-pro-team@latest/actions/hosting-your-own-runners/about-self-hosted-runners) that work on OpenShift.
+This repository contains Containerfiles for building container images that act as [self-hosted GitHub Action runners](https://docs.github.com/en/free-pro-team@latest/actions/hosting-your-own-runners/about-self-hosted-runners) that work on OpenShift.
 
 The [**OpenShift Actions Runner Chart**](https://github.com/redhat-actions/openshift-actions-runner-chart) is used to deploy these images into a cluster, and the [**OpenShift Actions Runner Installer**](https://github.com/redhat-actions/openshift-actions-runner-installer) is an Action to automate the chart install.
 
 ## Runners
 1. The [**base runner**](./base) is based on Fedora. It is intended to have a fairly minimal tool set to keep the image size as small as possible. It has all the GitHub Actions Runner needs, plus a limited number of popular Unix command-line tools.
-2. The [**buildah runner**](./buildah) for a Dockerfile which extends the base runner to add `buildah` and `podman`. This runner requires permissions that are disabled for by default on OpenShift. See [the buildah image README](./buildah/#README.md) for details.
+2. The [**buildah runner**](./buildah) extends the base runner to add `buildah` and `podman`. This runner requires permissions that are disabled for by default on OpenShift. See [the buildah image README](./buildah/#README.md) for details.
 3. The [**K8s tools runner**](./k8s-tools) installs a set of CLIs used to work with Kubernetes.
 4. The [**Node.js runner**](./node) includes a Node.js runtime.
 5. The [**Java runner**](./java) includes a JDK and JRE.
