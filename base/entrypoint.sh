@@ -1,4 +1,3 @@
-
 #!/bin/sh
 # Based on https://github.com/bbrowning/github-runner/blob/master/entrypoint.sh
 
@@ -6,81 +5,27 @@
 
 set -eE
 
-if [ -z "${GITHUB_OWNER:-}" ]; then
-    echo "Fatal: \$GITHUB_OWNER must be set in the environment"
+CREDS_FILE="${PWD}/.credentials"
+
+# Assume registration artifacts have been persisted from a previous start
+# if no PAT or TOKEN is provided, and simply attempt to start.
+if [ -n "${GITHUB_PAT:-}" ] || [ -n "${RUNNER_TOKEN:-}" ]; then
+    source ./register.sh
+elif [ -e "${CREDS_FILE}" ]; then
+    echo "No GITHUB_PAT or RUNNER_TOKEN provided. Using existing credentials file ${CREDS_FILE}."
+else
+    echo "No saved credentials found in ${CREDS_FILE}."
+    echo "Fatal: GITHUB_PAT or RUNNER_TOKEN must be set in the environment."
     exit 1
-elif [ -z "${GITHUB_PAT:-}" ]; then
-    echo "Fatal: \$GITHUB_PAT must be set in the environment"
-    exit 1
 fi
 
-if [ -z "${GITHUB_DOMAIN:-}" ]; then
-    echo "Connecting to public GitHub"
-    GITHUB_DOMAIN="github.com"
-    GITHUB_API_SERVER="api.github.com"
+if [ -n "${GITHUB_PAT:-}" ]; then
+    trap 'remove; exit 130' INT
+    trap 'remove; exit 143' TERM
 else
-    echo "Connecting to GitHub server at '$GITHUB_DOMAIN'"
-    GITHUB_API_SERVER="${GITHUB_DOMAIN}/api/v3"
+    trap 'exit 130' INT
+    trap 'exit 143' TERM
 fi
-
-echo "GitHub API server is '$GITHUB_API_SERVER'"
-
-if [ -z "${GITHUB_REPOSITORY:-}" ] && [ -n "${GITHUB_REPO:-}" ]; then
-    GITHUB_REPOSITORY=$GITHUB_REPO
-fi
-
-# https://docs.github.com/en/free-pro-team@latest/rest/reference/actions#create-a-registration-token-for-an-organization
-
-registration_url="https://${GITHUB_DOMAIN}/${GITHUB_OWNER}"
-if [ -z "${RUNNER_TOKEN:-}" ]; then
-    if [ -z "${GITHUB_REPOSITORY:-}" ]; then
-        echo "Runner is scoped to organization '${GITHUB_OWNER}'"
-        echo "View runner status at https://${GITHUB_DOMAIN}/organizations/${GITHUB_OWNER}/settings/actions"
-
-        token_url="https://${GITHUB_API_SERVER}/orgs/${GITHUB_OWNER}/actions/runners/registration-token"
-    else
-        echo "Runner is scoped to repository '${GITHUB_OWNER}/${GITHUB_REPOSITORY}'"
-        echo "View runner status at https://${GITHUB_DOMAIN}/${GITHUB_OWNER}/${GITHUB_REPOSITORY}/settings/actions"
-
-        token_url="https://${GITHUB_API_SERVER}/repos/${GITHUB_OWNER}/${GITHUB_REPOSITORY}/actions/runners/registration-token"
-        registration_url="${registration_url}/${GITHUB_REPOSITORY}"
-    fi
-    echo "Obtaining runner token from ${token_url}"
-
-    payload=$(curl -sSfLX POST -H "Authorization: token ${GITHUB_PAT}" ${token_url})
-    export RUNNER_TOKEN=$(echo $payload | jq .token --raw-output)
-    echo "Obtained registration token"
-else
-    echo "Using RUNNER_TOKEN from environment"
-fi
-
-labels_arg=""
-if [ -n "${RUNNER_LABELS:-}" ]; then
-    labels_arg="--labels $RUNNER_LABELS"
-else
-    echo "No labels provided"
-fi
-
-set -x
-./config.sh \
-    --name $(hostname) \
-    --token ${RUNNER_TOKEN} \
-    --url ${registration_url} \
-    --work ${RUNNER_WORKDIR} \
-    ${labels_arg} \
-    --unattended \
-    --replace
-set +x
-
-remove() {
-    payload=$(curl -sSfLX POST -H "Authorization: token ${GITHUB_PAT}" ${token_url%/registration-token}/remove-token)
-    export REMOVE_TOKEN=$(echo $payload | jq .token --raw-output)
-
-    ./config.sh remove --unattended --token "${REMOVE_TOKEN}"
-}
-
-trap 'remove; exit 130' INT
-trap 'remove; exit 143' TERM
 
 set -x
 ./bin/runsvc.sh --once &

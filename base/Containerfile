@@ -41,7 +41,7 @@ RUN chown -R ${USERNAME}:0 /home/${USERNAME}/ && \
     chgrp -R 0 /home/${USERNAME}/ && \
     chmod -R g=u /home/${USERNAME}/
 
-COPY --chown=${USERNAME}:0 entrypoint.sh uid.sh ./
+COPY --chown=${USERNAME}:0 entrypoint.sh uid.sh register.sh ./
 
 USER $UID
 
