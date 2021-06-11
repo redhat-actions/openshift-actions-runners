@@ -1,6 +1,8 @@
 #!/bin/sh
 # Based on https://github.com/bbrowning/github-runner/blob/master/entrypoint.sh
 
+set -eE
+
 if [ -z "${GITHUB_OWNER:-}" ]; then
     echo "Fatal: \$GITHUB_OWNER must be set in the environment"
     exit 1
@@ -77,4 +79,3 @@ remove() {
 
     ./config.sh remove --unattended --token "${REMOVE_TOKEN}"
 }
-
