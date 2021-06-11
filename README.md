@@ -39,19 +39,19 @@ See the [base image README](./base/#own-image).
 ## Running Locally
 You can run the images locally to test and develop.
 
-To launch and connect a runner to `redhat-actions/openshift-actions-runner` with the labels `local` and `docker`:
+To launch and connect a runner to `redhat-actions/openshift-actions-runner` with the labels `local` and `podman`:
 ```sh
-docker run \
+podman run \
     --env GITHUB_PAT=$GITHUB_PAT \
     --env GITHUB_OWNER=redhat-actions \
     --env GITHUB_REPOSITORY=openshift-actions-runner \
-    --env RUNNER_LABELS="local,docker" \
+    --env RUNNER_LABELS="local,podman" \
     quay.io/redhat-github-actions/runner:v1.0.0
 ```
 
 Or, to run a shell for debugging:
 ```sh
-docker run -it --entrypoint=/bin/bash quay.io/redhat-github-actions/runner:v1.0.0
+podman run -it --entrypoint=/bin/bash quay.io/redhat-github-actions/runner:v1.0.0
 ```
 
 ## Running Locally without PAT
@@ -72,7 +72,7 @@ podman run \
     quay.io/redhat-github-actions/runner:v1.0.0 \
     bash -c "./register.sh && cp -rT . /persistence"
 # Run container with volume mounted over runner home directory
-podman run \               
+podman run \
     --rm -v runner:/home/runner \
     quay.io/redhat-github-actions/runner:v1.0.0
 ```
@@ -80,7 +80,7 @@ podman run \
 <a id="enterprise-support"></a>
 
 ## GitHub Enterprise Support
-You can use any of the runners on your GitHub Enterprise server by overriding `GITHUB_DOMAIN` in the environment, using `docker run --env` or using the [chart](https://github.com/redhat-actions/openshift-actions-runner-chart).
+You can use any of the runners on your GitHub Enterprise server by overriding `GITHUB_DOMAIN` in the environment, using `podman run --env` or using the [chart](https://github.com/redhat-actions/openshift-actions-runner-chart).
 
 For example, if you set:
 ```
