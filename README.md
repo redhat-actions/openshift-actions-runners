@@ -54,6 +54,29 @@ Or, to run a shell for debugging:
 docker run -it --entrypoint=/bin/bash quay.io/redhat-github-actions/runner:v1.0.0
 ```
 
+## Running Locally without PAT
+
+If you're not comfortable persisting a PAT with access to all of your repositories, it is also possible to manually generate a runner registration token and use that. Note that those are only good for 60 minutes, so you must keep the local files created upon registration in order to be able to restart your runner. A similar process may be especially useful in Kubernetes, so that Pods can be recreated without manual intervention.
+
+```sh
+# Create volume to persist authentication and configuration
+podman volume create runner
+# Perform registration, and copy artifacts to volume
+podman run \
+    --env RUNNER_TOKEN=$RUNNER_TOKEN \
+    --env GITHUB_OWNER=redhat-actions \
+    --env GITHUB_REPOSITORY=openshift-actions-runner \
+    --env RUNNER_LABELS="local,podman" \
+    --rm -v runner:/persistence \
+    --entrypoint='' \
+    quay.io/redhat-github-actions/runner:v1.0.0 \
+    bash -c "./register.sh && cp -rT . /persistence"
+# Run container with volume mounted over runner home directory
+podman run \               
+    --rm -v runner:/home/runner \
+    quay.io/redhat-github-actions/runner:v1.0.0
+```
+
 <a id="enterprise-support"></a>
 
 ## GitHub Enterprise Support
