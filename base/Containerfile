@@ -46,3 +46,5 @@ COPY --chown=${USERNAME}:0 entrypoint.sh uid.sh register.sh ./
 USER $UID
 
 ENTRYPOINT ./entrypoint.sh
+
+# Test comment
