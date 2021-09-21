@@ -6,7 +6,6 @@ on:
 
 
 env:
-  REGISTRY_USER: redhat-github-actions+redhat_actions_ci_pusher
   REGISTRY_URL: quay.io/redhat-github-actions
 
   BASE_IMG_NAME: runner
@@ -138,8 +137,8 @@ jobs:
           image: ${{ env.BASE_IMG_NAME }}
           tags: ${{ env.IMG_TAGS }}
           registry: ${{ env.REGISTRY_URL }}
-          username: ${{ env.REGISTRY_USER }}
-          password: ${{ secrets.QUAY_TOKEN }}
+          username: ${{ secrets.REGISTRY_USER }}
+          password: ${{ secrets.REGISTRY_PASSWORD }}
 
       - name: Determine if child images should be built
         run: |
@@ -183,8 +182,8 @@ jobs:
           image: ${{ env.BUILDAH_IMG_NAME }}
           tags: ${{ env.IMG_TAGS }}
           registry: ${{ env.REGISTRY_URL }}
-          username: ${{ env.REGISTRY_USER }}
-          password: ${{ secrets.QUAY_TOKEN }}
+          username: ${{ secrets.REGISTRY_USER }}
+          password: ${{ secrets.REGISTRY_PASSWORD }}
 
       - name: Build K8s tools image
         if: |
@@ -213,8 +212,8 @@ jobs:
           image: ${{ env.K8S_TOOLS_IMG_NAME }}
           tags: ${{ env.IMG_TAGS }}
           registry: ${{ env.REGISTRY_URL }}
-          username: ${{ env.REGISTRY_USER }}
-          password: ${{ secrets.QUAY_TOKEN }}
+          username: ${{ secrets.REGISTRY_USER }}
+          password: ${{ secrets.REGISTRY_PASSWORD }}
 
       - name: Build Node image
         if: |
@@ -243,8 +242,8 @@ jobs:
           image: ${{ env.NODE_IMG_NAME }}
           tags: ${{ env.IMG_TAGS }}
           registry: ${{ env.REGISTRY_URL }}
-          username: ${{ env.REGISTRY_USER }}
-          password: ${{ secrets.QUAY_TOKEN }}
+          username: ${{ secrets.REGISTRY_USER }}
+          password: ${{ secrets.REGISTRY_PASSWORD }}
 
       - name: Build Java image
         if: |
@@ -273,5 +272,5 @@ jobs:
           image: ${{ env.JAVA_IMG_NAME }}
           tags: ${{ env.IMG_TAGS }}
           registry: ${{ env.REGISTRY_URL }}
-          username: ${{ env.REGISTRY_USER }}
-          password: ${{ secrets.QUAY_TOKEN }}
+          username: ${{ secrets.REGISTRY_USER }}
+          password: ${{ secrets.REGISTRY_PASSWORD }}
