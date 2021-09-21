@@ -41,11 +41,14 @@ jobs:
 
       - name: Determine changed directories
         id: is_dir_changed
-        uses: actions/github-script@v3
+        uses: actions/github-script@v4
         with:
           script: |
             const changedFiles = ${{ steps.get_changed_files.outputs.all }};
             console.log(`Changed files: ${JSON.stringify(changedFiles)}`);
+
+            // console.log(`payload ${JSON.stringify(context.payload)}`);
+            // console.log(`eventName ${JSON.stringify(context.eventName)}`);
 
             const BASE = "base";
             const dirsChanged = {
@@ -64,6 +67,10 @@ jobs:
             let rebuildAll = false;
             if (context.ref.startsWith("refs/tags/")) {
               console.log(`Tag build; all images will be rebuilt.`);
+              rebuildAll = true;
+            }
+            else if (context.eventName === "workflow_dispatch") {
+              console.log(`Workflow triggered by workflow_dispatch; all images will be rebuilt`);
               rebuildAll = true;
             }
             else if (dirsChanged[BASE]) {
