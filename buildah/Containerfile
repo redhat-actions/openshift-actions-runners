@@ -3,7 +3,7 @@ FROM $BASE_IMG AS buildah-runner
 
 USER root
 
-# https://github.com/containers/buildah/blob/master/docs/tutorials/05-openshift-rootless-bud.md
+# https://github.com/containers/buildah/blob/main/docs/tutorials/05-openshift-rootless-build.md
 # https://github.com/containers/buildah/blob/master/contrib/buildahimage/stable/Dockerfile
 # https://github.com/containers/buildah/issues/1011
 # https://github.com/containers/buildah/issues/3053
