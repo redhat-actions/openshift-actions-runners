@@ -31,10 +31,12 @@ _Note: All API routes mapped to their permissions can be found [here](https://do
 
 If you want to create a GitHub App for your account, open the following link to the creation page, enter any unique name in the "GitHub App name" field, and hit the "Create GitHub App" button at the bottom of the page.
 
+<!-- markdown-link-check-disable-next-line -->
 - [Create GitHub Apps on your account](https://github.com/settings/apps/new?url=https://github.com/redhat-actions/openshift-actions-runners&webhook_active=false&public=false&administration=write&actions=read)
 
 If you want to create a GitHub App for your organization, replace the `:org` part of the following URL with your organization name before opening it. Then enter any unique name in the "GitHub App name" field, and hit the "Create GitHub App" button at the bottom of the page to create a GitHub App.
 
+<!-- markdown-link-check-disable-next-line -->
 - [Create GitHub Apps on your organization](https://github.com/organizations/:org/settings/apps/new?url=https://github.com/redhat-actions/openshift-actions-runners&webhook_active=false&public=false&administration=write&organization_self_hosted_runners=write&actions=read)
 
 You will see an *App ID* on the page of the GitHub App you created. You will need the value of this App ID later.

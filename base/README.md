@@ -15,9 +15,9 @@ Some basic CLI tools are installed in addition to what's in the parent Fedora im
 - `git`
 - `hostname`
 - `jq`
+- `openssl`
 - `procps` (`ps`, `pgrep`)
 - `which`
-- `openssl`
 
 <a id="own-image"></a>
 ## Building your own runner image
