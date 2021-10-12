@@ -3,7 +3,7 @@ FROM fedora:33
 # Adapted from https://github.com/bbrowning/github-runner/blob/master/Dockerfile
 RUN dnf -y upgrade --security && \
     dnf -y --setopt=skip_missing_names_on_install=False install \
-    curl git jq hostname procps findutils which && \
+    curl git jq hostname procps findutils which openssl && \
     dnf clean all
 
 # The UID env var should be used in child Containerfile.
@@ -20,6 +20,9 @@ WORKDIR /home/${USERNAME}
 
 # Override these when creating the container.
 ENV GITHUB_PAT ""
+ENV GITHUB_APP_ID ""
+ENV GITHUB_APP_INSTALL_ID ""
+ENV GITHUB_APP_PEM ""
 ENV GITHUB_OWNER ""
 ENV GITHUB_REPOSITORY ""
 ENV RUNNER_WORKDIR /home/${USERNAME}/_work
@@ -41,7 +44,7 @@ RUN chown -R ${USERNAME}:0 /home/${USERNAME}/ && \
     chgrp -R 0 /home/${USERNAME}/ && \
     chmod -R g=u /home/${USERNAME}/
 
-COPY --chown=${USERNAME}:0 entrypoint.sh uid.sh register.sh ./
+COPY --chown=${USERNAME}:0 entrypoint.sh uid.sh register.sh get_github_app_token.sh ./
 
 USER $UID
 

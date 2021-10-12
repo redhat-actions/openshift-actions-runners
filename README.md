@@ -59,6 +59,12 @@ A Runner Token can be used as an alternative to PAT or GitHub App authentication
 
 Refer to [Authenticating with a Runner Token](./docs/runner-token.md).
 
+## Running with Github App Authentication
+
+If you are able to use a GitHub App it is highly recommended over the PAT because you have greater control of the API permissions granted to it and you do not need a bot or service account.
+
+Refer to [Authenticating with GitHub App Authentication](./docs/github-app-authentication.md).
+
 <a id="enterprise-support"></a>
 
 ## GitHub Enterprise Support
@@ -92,3 +98,5 @@ If you encounter any other issues, please [open an issue](https://github.com/red
 
 ## Credits
 This repository builds on the work done in [bbrowning/github-runner](https://github.com/bbrowning/github-runner), which is forked from [SanderKnape/github-runner](https://github.com/SanderKnape/github-runner).
+
+The Github App creation tutorial is heavily based on the excellent README in [actions-runner-controller/actions-runner-controller](https://github.com/actions-runner-controller/actions-runner-controller)
