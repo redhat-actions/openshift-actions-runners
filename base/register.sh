@@ -30,11 +30,8 @@ fi
 
 registration_url="https://${GITHUB_DOMAIN}/${GITHUB_OWNER}${GITHUB_REPOSITORY:+/$GITHUB_REPOSITORY}"
 
-if [ -z "${GITHUB_PAT:-}" ]; then
-    echo "GITHUB_PAT not set in the environment. Automatic runner removal will be disabled."
-    echo "Visit ${registration_url}/settings/actions/runners to manually force removal of runner."
-elif [ -z "${GITHUB_APP_ID:-}" ]; then
-    echo "GITHUB_APP variables not set in the environment. Automatic runner removal will be disabled."
+if [ -z "${GITHUB_PAT:-}" ] && [ -z "${GITHUB_APP_ID:-}" ]; then
+    echo "Neither GITHUB_PAT nor the GITHUB_APP variables are set in the environment. Automatic runner removal will be disabled."
     echo "Visit ${registration_url}/settings/actions/runners to manually force removal of runner."
 fi
 
@@ -53,10 +50,11 @@ if [ -z "${RUNNER_TOKEN:-}" ]; then
     echo "Obtaining runner token from ${token_url}"
 
     if [ -n "${GITHUB_APP_ID:-}" ] && [ -n "${GITHUB_APP_INSTALL_ID:-}" ] && [ -n "${GITHUB_APP_PEM:-}" ]; then
-        echo "Preferring Github App authentication over PAT authentication."
+        echo "GITHUB_APP environment variables are set. Using GitHub App authentication."
         app_token=$(get_github_app_token)
         payload=$(curl -sSfLX POST -H "Authorization: token ${app_token}" ${token_url})
     else
+        echo "Using GITHUB_PAT for authentication."
         payload=$(curl -sSfLX POST -H "Authorization: token ${GITHUB_PAT}" ${token_url})
     fi
 

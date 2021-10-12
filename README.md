@@ -61,72 +61,9 @@ Refer to [Authenticating with a Runner Token](./docs/runner-token.md).
 
 ## Running with Github App Authentication
 
-If you are able to use a Github App it is highly recommended over the PAT because you have greater control of the API permissions granted to it and you do not need a bot or service account.
+If you are able to use a GitHub App it is highly recommended over the PAT because you have greater control of the API permissions granted to it and you do not need a bot or service account.
 
-### Setting up a Github App for Runner Registration
-
-You can create a GitHub App for either your user account or any organization, below are the app permissions required for each supported type of runner:
-
-_Note: Links are provided further down to create an app for your logged in user account or an organization with the permissions for all runner types set in each link's query string_
-
-**Required Permissions for Repository Runners:**<br />
-**Repository Permissions**
-
-* Actions (read)
-* Administration (read / write)
-* Metadata (read)
-
-**Required Permissions for Organization Runners:**<br />
-**Repository Permissions**
-
-* Actions (read)
-* Metadata (read)
-
-**Organization Permissions**
-* Self-hosted runners (read / write)
-
-
-_Note: All API routes mapped to their permissions can be found [here](https://docs.github.com/en/rest/reference/permissions-required-for-github-apps) if you wish to review_
-
----
-
-**Setup Steps**
-
-If you want to create a GitHub App for your account, open the following link to the creation page, enter any unique name in the "GitHub App name" field, and hit the "Create GitHub App" button at the bottom of the page.
-
-- [Create GitHub Apps on your account](https://github.com/settings/apps/new?url=https://github.com/redhat-actions/openshift-actions-runners&webhook_active=false&public=false&administration=write&actions=read)
-
-If you want to create a GitHub App for your organization, replace the `:org` part of the following URL with your organization name before opening it. Then enter any unique name in the "GitHub App name" field, and hit the "Create GitHub App" button at the bottom of the page to create a GitHub App.
-
-- [Create GitHub Apps on your organization](https://github.com/organizations/:org/settings/apps/new?url=https://github.com/redhat-actions/openshift-actions-runners&webhook_active=false&public=false&administration=write&organization_self_hosted_runners=write&actions=read)
-
-You will see an *App ID* on the page of the GitHub App you created. You will need the value of this App ID later.
-
-Download the private key file by pushing the "Generate a private key" button at the bottom of the GitHub App page. This file will also be used later.
-
-Go to the "Install App" tab on the left side of the page and install the GitHub App that you created for your account or organization.
-
-When the installation is complete, you will be taken to a URL in one of the following formats, the last number of the URL will be used as the Installation ID later (For example, if the URL ends in `settings/installations/12345`, then the Installation ID is `12345`).
-
-- `https://github.com/settings/installations/${INSTALLATION_ID}`
-- `https://github.com/organizations/eventreactor/settings/installations/${INSTALLATION_ID}`
-
-### Running Locally with Github App Authentication
-
-You need to set the `GITHUB_APP_ID`, `GITHUB_APP_INSTALL_ID`, and `GITHUB_APP_PEM` env variables and pass them to your container. The easiest way to get the private key in the correct form is to copy paste it into the environment variable.
-
-To launch and connect a runner to `redhat-actions/openshift-actions-runner` with the labels `local` and `podman`:
-
-```sh
-podman run \
-    --env GITHUB_APP_ID \
-    --env GITHUB_APP_INSTALL_ID \
-    --env GITHUB_APP_PEM \
-    --env GITHUB_OWNER=redhat-actions \
-    --env GITHUB_REPOSITORY=openshift-actions-runner \
-    --env RUNNER_LABELS="local,podman" \
-    quay.io/redhat-github-actions/runner:latest
-```
+Refer to [Authenticating with GitHub App Authentication](./docs/github-app-authentication.md).
 
 <a id="enterprise-support"></a>
 
@@ -162,4 +99,4 @@ If you encounter any other issues, please [open an issue](https://github.com/red
 ## Credits
 This repository builds on the work done in [bbrowning/github-runner](https://github.com/bbrowning/github-runner), which is forked from [SanderKnape/github-runner](https://github.com/SanderKnape/github-runner).
 
-The Github App creation tutorial is heavily based on the excellent README in [ctions-runner-controller/actions-runner-controller](https://github.com/actions-runner-controller/actions-runner-controller)
+The Github App creation tutorial is heavily based on the excellent README in [actions-runner-controller/actions-runner-controller](https://github.com/actions-runner-controller/actions-runner-controller)
