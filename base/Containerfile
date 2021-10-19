@@ -26,6 +26,7 @@ ENV GITHUB_APP_PEM ""
 ENV GITHUB_OWNER ""
 ENV GITHUB_REPOSITORY ""
 ENV RUNNER_WORKDIR /home/${USERNAME}/_work
+ENV RUNNER_GROUP ""
 ENV RUNNER_LABELS ""
 
 # Allow group 0 to modify these /etc/ files since on openshift, the dynamically-assigned user is always part of group 0.

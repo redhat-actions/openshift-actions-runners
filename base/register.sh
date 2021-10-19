@@ -71,6 +71,14 @@ else
     echo "No labels provided"
 fi
 
+runner_group_arg=""
+# Runner groups are only valid for organization-wide runners
+if [ -z "${GITHUB_REPOSITORY:-}" ] && [ -n "${RUNNER_GROUP:-}" ]; then
+    runner_group_arg="--runnergroup $RUNNER_GROUP"
+else
+    echo "No runner group provided"
+fi
+
 if [ -n "${RUNNER_TOKEN:-}" ]; then
     set -x
     ./config.sh \
@@ -79,6 +87,7 @@ if [ -n "${RUNNER_TOKEN:-}" ]; then
         --url ${registration_url} \
         --work ${RUNNER_WORKDIR} \
         ${labels_arg} \
+        ${runner_group_arg} \
         --unattended \
         --replace
     set +x
