@@ -77,7 +77,7 @@ if [ -n "${RUNNER_GROUP:-}" ]; then
     if [ -z "${GITHUB_REPOSITORY:-}" ]; then
         runner_group_arg="--runnergroup $RUNNER_GROUP"
     else
-        echo "Not applying runner group '${RUNNER_GROUP} - Runner groups are not valid for repository-scoped runners."
+        echo "Not applying runner group '${RUNNER_GROUP}' - Runner groups are not valid for repository-scoped runners."
     fi
 else
     echo "No runner group provided"
