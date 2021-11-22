@@ -83,6 +83,11 @@ else
     echo "No runner group provided"
 fi
 
+ephemeral_arg=""
+if [ -n "${EPHEMERAL:-}" ]; then
+    ephemeral_arg="--ephemeral"
+fi
+
 if [ -n "${RUNNER_TOKEN:-}" ]; then
     set -x
     ./config.sh \
@@ -92,6 +97,7 @@ if [ -n "${RUNNER_TOKEN:-}" ]; then
         --work ${RUNNER_WORKDIR} \
         ${labels_arg} \
         ${runner_group_arg} \
+        ${ephemeral_arg} \
         --unattended \
         --replace
     set +x

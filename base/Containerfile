@@ -28,6 +28,7 @@ ENV GITHUB_REPOSITORY ""
 ENV RUNNER_WORKDIR /home/${USERNAME}/_work
 ENV RUNNER_GROUP ""
 ENV RUNNER_LABELS ""
+ENV EPHEMERAL ""
 
 # Allow group 0 to modify these /etc/ files since on openshift, the dynamically-assigned user is always part of group 0.
 # Also see ./uid.sh for the usage of these permissions.
