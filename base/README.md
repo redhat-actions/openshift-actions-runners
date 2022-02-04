@@ -2,7 +2,7 @@
 
 [![Quay org](https://img.shields.io/badge/quay-redhat--github--actions%2Frunner-red)](https://quay.io/repository/redhat-github-actions/runner)
 
-The base actions runner is meant to be minimal. It is build from [`fedora:33`](https://hub.docker.com/_/fedora), and contains the [GitHub Actions Runner](https://github.com/actions/runner/) and all its dependencies. At image build time, the latest runner version [is downloaded](./get-runner-release.sh), and the runner self-updates when it is connected to GitHub.
+The base actions runner is meant to be minimal. It is build from [`fedora:35`](https://hub.docker.com/_/fedora), and contains the [GitHub Actions Runner](https://github.com/actions/runner/) and all its dependencies. At image build time, the latest runner version [is downloaded](./get-runner-release.sh), and the runner self-updates when it is connected to GitHub.
 
 On OpenShift, containers run as a dynamically assigned user ID You can read about this on [the OpenShift blog](https://www.openshift.com/blog/a-guide-to-openshift-and-uids). This image contains logic to assign that user ID to the `runner` user and make sure the home directory and other required files are have the necessary permissions.
 
