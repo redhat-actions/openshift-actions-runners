@@ -5,6 +5,6 @@ USER root
 
 # https://nodejs.org/en/download/package-manager/#centos-fedora-and-red-hat-enterprise-linux
 # 14 is LTS
-RUN dnf module install -y nodejs:14/default
+RUN dnf module install -y nodejs:14
 
 USER $UID
