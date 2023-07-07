@@ -9,9 +9,11 @@ USER root
 # https://github.com/containers/buildah/issues/3053
 
 RUN dnf -y update && \
-    dnf -y install xz slirp4netns buildah podman fuse-overlayfs shadow-utils --exclude container-selinux && \
+    dnf -y install xz slirp4netns buildah podman fuse-overlayfs shadow-utils python3-pip --exclude container-selinux && \
     dnf -y reinstall shadow-utils && \
     dnf clean all
+
+RUN pip3 install podman-compose
 
 ARG OC_VERSION=4.7.4
 RUN curl -sSLf https://mirror.openshift.com/pub/openshift-v4/x86_64/clients/ocp/${OC_VERSION}/openshift-client-linux.tar.gz \
@@ -26,6 +28,12 @@ ADD https://raw.githubusercontent.com/containers/buildah/master/contrib/buildahi
 RUN chgrp -R 0 /etc/containers/ && \
     chmod -R a+r /etc/containers/ && \
     chmod -R g+w /etc/containers/
+
+# podman-login
+# https://github.com/redhat-actions/podman-login/issues/18
+RUN mkdir -vp /home/$USERNAME/.docker && \
+    echo "{ \"auths\": {} }" > /home/$USERNAME/.docker/config.json && \
+    chown -Rv ${USERNAME} /home/$USERNAME/.docker
 
 # Use VFS since fuse does not work
 # https://github.com/containers/buildah/blob/master/vendor/github.com/containers/storage/storage.conf
